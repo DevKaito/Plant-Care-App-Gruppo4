@@ -1,58 +1,172 @@
 import React from 'react';
-import { View, Text, StyleSheet, StatusBar, FlatList, Image } from 'react-native';
+import {
+    View,
+    Text,
+    StyleSheet,
+    FlatList,
+    TouchableOpacity,
+    Image,
+    SafeAreaView,
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-const demoPlants = [
-        { key: 1, name: 'Fern', species: 'Pteridophyta', ownedSince: new Date('2022-01-01'), waterFrequency: 7, image: require('../assets/placeholder.png'), state: 'Healthy' },
-        { key: 2, name: 'Cactus', species: 'Cactaceae', ownedSince: new Date('2021-06-15'), waterFrequency: 14, image: require('../assets/placeholder.png'), state: 'Sick' },
-        { key: 3, name: 'Bamboo', species: 'Poaceae', ownedSince: new Date('2020-03-10'), waterFrequency: 5, image: require('../assets/placeholder.png'), state: 'To Check' }
-    ]
+type Plant = {
+    id: string;
+    name: string;
+};
 
-export default function HomeScreen(){
-    const recentPlants = demoPlants.slice(0,3);
-    
-    return (
-        <View style={styles.container}>
-            <View style={styles.container}>
-                <Text style={styles.title}>Ultime piante aggiunte</Text>
-                <FlatList 
-                    contentContainerStyle = {{flex:1, justifyContent: 'center', flexDirection: 'row'}}
-                    data={demoPlants}
-                    keyExtractor={item => item.key.toString()}
-                    renderItem={({ item }) => (
-                        <View style = {{padding: 10}}>
-                            <Image source={item.image} style={styles.image} />
-                            <Text>{item.name}</Text>
-                            <Text>{item.species}</Text>
-                        </View>
-                    )}        
-                />
+const dummyPlants: Plant[] = [
+    { id: 'p1', name: 'Nome p1' },
+    { id: 'p2', name: 'Nome p2' },
+    { id: 'p3', name: 'Nome p3' },
+];
+
+const HomeScreen: React.FC = () => {
+    const navigation = useNavigation();
+
+    const renderPlantItem = ({ item }: { item: Plant }) => (
+        <View style={styles.row}>
+            <View style={styles.idBox}>
+                <Text style={styles.idText}>{item.id}</Text>
             </View>
-            <View style={styles.container}>
-                <Text>Welcome to the Home Screen!</Text>
-                <StatusBar />
+            <View style={styles.nameBox}>
+                <Text style={styles.nameText}>{item.name}</Text>
             </View>
-            
+            <TouchableOpacity style={styles.curaButton}>
+                <Text style={styles.curaText}>Cura</Text>
+            </TouchableOpacity>
         </View>
     );
-}
+
+    return (
+        <SafeAreaView style={styles.container}>
+            <Text style={styles.header}>Plant Care App</Text>
+
+            <Text style={styles.sectionTitle}>Piante aggiunte di recente</Text>
+
+            <View style={styles.categoryRow}>
+                <View style={styles.categoryItem}>
+                    <Image source={{ uri: 'https://via.placeholder.com/60?text=Cactus' }} style={styles.categoryImage} />
+                    <Text style={styles.categoryText}>Cactus</Text>
+                </View>
+                <View style={styles.categoryItem}>
+                    <Image source={{ uri: 'https://via.placeholder.com/60?text=Palma' }} style={styles.categoryImage} />
+                    <Text style={styles.categoryText}>Palma</Text>
+                </View>
+                <View style={styles.categoryItem}>
+                    <Image source={{ uri: 'https://via.placeholder.com/60?text=Bonsai' }} style={styles.categoryImage} />
+                    <Text style={styles.categoryText}>Bonsai</Text>
+                </View>
+            </View>
+
+            <View style={styles.boxContainer}>
+                <FlatList
+                    data={dummyPlants}
+                    keyExtractor={(item) => item.id}
+                    renderItem={renderPlantItem}
+                />
+            </View>
+
+            <TouchableOpacity
+                style={styles.addButton}
+                onPress={() => navigation.navigate('AddEditPlant' as never)}
+            >
+                <Text style={styles.addText}>+</Text>
+            </TouchableOpacity>
+        </SafeAreaView>
+    );
+};
+
+export default HomeScreen;
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        paddingHorizontal: 16,
         backgroundColor: '#fff',
-        alignItems: 'center',
-        //justifyContent: 'center',
     },
-    title: { fontSize: 20, fontWeight: 'bold', marginBottom: 12 },
-    plantList: { gap: 12 },
-    card: {
-        width: 150,
-        padding: 12,
-        backgroundColor: '#f0f0f0',
-        borderRadius: 12,
+    header: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginTop: 10,
+        marginBottom: 12,
+    },
+    sectionTitle: {
+        fontSize: 16,
+        fontWeight: '600',
+        textAlign: 'center',
+        marginVertical: 8,
+    },
+    categoryRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginBottom: 16,
+    },
+    categoryItem: {
         alignItems: 'center',
     },
-    image: { width: 48, height: 48, borderRadius: 40, marginBottom: 8 },
-    name: { fontWeight: 'bold', fontSize: 16 },
-    species: { fontSize: 12, color: '#666' },
-})
+    categoryImage: {
+        width: 60,
+        height: 60,
+    },
+    categoryText: {
+        marginTop: 4,
+        fontSize: 12,
+    },
+    boxContainer: {
+        borderWidth: 2,
+        borderColor: '#000',
+        borderRadius: 8,
+        padding: 8,
+        marginBottom: 80,
+    },
+    row: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    idBox: {
+        backgroundColor: '#4CAF50',
+        padding: 10,
+        borderRadius: 4,
+        marginRight: 10,
+    },
+    idText: {
+        color: 'white',
+        fontWeight: 'bold',
+    },
+    nameBox: {
+        flex: 1,
+    },
+    nameText: {
+        fontSize: 16,
+    },
+    curaButton: {
+        backgroundColor: '#4CAF50',
+        paddingVertical: 6,
+        paddingHorizontal: 12,
+        borderRadius: 20,
+    },
+    curaText: {
+        color: '#fff',
+        fontWeight: 'bold',
+    },
+    addButton: {
+        position: 'absolute',
+        right: 20,
+        bottom: 90,
+        backgroundColor: '#4CAF50',
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        alignItems: 'center',
+        justifyContent: 'center',
+        elevation: 5,
+    },
+    addText: {
+        color: 'white',
+        fontSize: 28,
+        fontWeight: 'bold',
+    },
+});
