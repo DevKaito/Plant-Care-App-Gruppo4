@@ -8,7 +8,6 @@ import {
     Image,
     SafeAreaView,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 
 type Plant = {
     id: string;
@@ -22,8 +21,6 @@ const dummyPlants: Plant[] = [
 ];
 
 const HomeScreen: React.FC = () => {
-    const navigation = useNavigation();
-
     const renderPlantItem = ({ item }: { item: Plant }) => (
         <View style={styles.row}>
             <View style={styles.idBox}>
@@ -46,15 +43,24 @@ const HomeScreen: React.FC = () => {
 
             <View style={styles.categoryRow}>
                 <View style={styles.categoryItem}>
-                    <Image source={{ uri: 'https://via.placeholder.com/60?text=Cactus' }} style={styles.categoryImage} />
+                    <Image
+                        source={{ uri: 'https://via.placeholder.com/60?text=Cactus' }}
+                        style={styles.categoryImage}
+                    />
                     <Text style={styles.categoryText}>Cactus</Text>
                 </View>
                 <View style={styles.categoryItem}>
-                    <Image source={{ uri: 'https://via.placeholder.com/60?text=Palma' }} style={styles.categoryImage} />
+                    <Image
+                        source={{ uri: 'https://via.placeholder.com/60?text=Palma' }}
+                        style={styles.categoryImage}
+                    />
                     <Text style={styles.categoryText}>Palma</Text>
                 </View>
                 <View style={styles.categoryItem}>
-                    <Image source={{ uri: 'https://via.placeholder.com/60?text=Bonsai' }} style={styles.categoryImage} />
+                    <Image
+                        source={{ uri: 'https://via.placeholder.com/60?text=Bonsai' }}
+                        style={styles.categoryImage}
+                    />
                     <Text style={styles.categoryText}>Bonsai</Text>
                 </View>
             </View>
@@ -66,13 +72,6 @@ const HomeScreen: React.FC = () => {
                     renderItem={renderPlantItem}
                 />
             </View>
-
-            <TouchableOpacity
-                style={styles.addButton}
-                onPress={() => navigation.navigate('AddEditPlant' as never)}
-            >
-                <Text style={styles.addText}>+</Text>
-            </TouchableOpacity>
         </SafeAreaView>
     );
 };
@@ -152,21 +151,6 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontWeight: 'bold',
     },
-    addButton: {
-        position: 'absolute',
-        right: 20,
-        bottom: 90,
-        backgroundColor: '#4CAF50',
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-        alignItems: 'center',
-        justifyContent: 'center',
-        elevation: 5,
-    },
-    addText: {
-        color: 'white',
-        fontSize: 28,
-        fontWeight: 'bold',
-    },
 });
+
+
