@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const AddPlantScreen = () => {
     const navigation = useNavigation<any>();
@@ -23,6 +24,8 @@ const AddPlantScreen = () => {
     const [watering, setWatering] = useState('');
     const [status, setStatus] = useState('sana');
     const [notes, setNotes] = useState('');
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [date, setDate] = useState(new Date());
 
     const resetForm = () => {
         setName('');
@@ -57,6 +60,15 @@ const AddPlantScreen = () => {
         navigation.goBack();
     };
 
+    const handleDateChange = (event: any, selectedDate?: Date) => {
+        setShowDatePicker(false);
+        if (selectedDate) {
+            setDate(selectedDate);
+            const isoDate = selectedDate.toISOString().split('T')[0];
+            setAcquisitionDate(isoDate);
+        }
+    };
+
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <View style={styles.imagePlaceholder}>
@@ -67,22 +79,46 @@ const AddPlantScreen = () => {
             <View style={styles.row}>
                 <View style={styles.inputGroup}>
                     <Text>Nome:</Text>
-                    <TextInput style={styles.input} value={name} onChangeText={setName} />
+                    <TextInput
+                        style={styles.input}
+                        value={name}
+                        onChangeText={(text) => {
+                            if (/^[a-zA-ZÀ-ÿ0-9]*$/.test(text)) {
+                                setName(text);
+                            }
+                        }}
+                        maxLength={50}
+                    />
                 </View>
                 <View style={styles.inputGroup}>
                     <Text>Specie:</Text>
-                    <TextInput style={styles.input} value={species} onChangeText={setSpecies} />
+                    <TextInput
+                        style={styles.input}
+                        value={species}
+                        onChangeText={(text) => {
+                            if (/^[a-zA-ZÀ-ÿ\s]*$/.test(text)) { 
+                                setSpecies(text);
+                            }
+                        }}
+                        maxLength={50}
+                    />
                 </View>
             </View>
 
             <View style={styles.inputGroup}>
                 <Text>Data acquisizione:</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="YYYY-MM-DD"
-                    value={acquisitionDate}
-                    onChangeText={setAcquisitionDate}
-                />
+                <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.input}>
+                    <Text style={{ color: acquisitionDate ? 'black' : 'gray' }}>{acquisitionDate || 'Seleziona una data'}</Text>
+                </TouchableOpacity>
+                {showDatePicker && (
+                    <DateTimePicker
+                        value={date}
+                        mode="date"
+                        display="default"
+                        onChange={handleDateChange}
+                        maximumDate={new Date()}
+                    />
+                )}
             </View>
 
             <View style={styles.inputGroup}>
@@ -92,6 +128,7 @@ const AddPlantScreen = () => {
                     keyboardType="numeric"
                     value={pruning}
                     onChangeText={setPruning}
+                    maxLength={3}
                 />
             </View>
 
@@ -102,6 +139,7 @@ const AddPlantScreen = () => {
                     keyboardType="numeric"
                     value={repotting}
                     onChangeText={setRepotting}
+                    maxLength={3}
                 />
             </View>
 
@@ -112,6 +150,7 @@ const AddPlantScreen = () => {
                     keyboardType="numeric"
                     value={watering}
                     onChangeText={setWatering}
+                    maxLength={3}
                 />
             </View>
 
@@ -133,6 +172,7 @@ const AddPlantScreen = () => {
                     value={notes}
                     onChangeText={setNotes}
                     multiline
+                    maxLength={750}
                 />
             </View>
 
