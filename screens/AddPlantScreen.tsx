@@ -2,6 +2,8 @@
 import React, { useState } from 'react';
 import {
     View,
+    Image,
+    Button,
     Text,
     TextInput,
     StyleSheet,
@@ -14,6 +16,7 @@ import { Plant, PlantState } from '../models/Plant';
 import { useNavigation } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as ImagePicker from 'expo-image-picker';
 
 const AddPlantScreen = () => {
     const navigation = useNavigation<any>();
@@ -28,6 +31,7 @@ const AddPlantScreen = () => {
     const [notes, setNotes] = useState('');
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [date, setDate] = useState(new Date());
+    const [imageUri, setImageUri] = useState<string | null> (null);
 
     const resetForm = () => {
         setName('');
@@ -52,7 +56,7 @@ const AddPlantScreen = () => {
                 repotFrequency: repotting ? parseInt(repotting) : 0,
                 pruneFrequency: pruning ? parseInt(pruning) : 0,
                 state: status as PlantState,
-                image: '',
+                image: imageUri ?? '', //se la variabile è null setta '' come immagine
             };
             await insertPlant(db, newPlant);
             resetForm();
@@ -77,12 +81,37 @@ const AddPlantScreen = () => {
         }
     };
 
+    const pickImage = async () => {
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ['images'],
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+
+        if (!result.canceled){
+            setImageUri(result.assets[0].uri);
+        }
+    }
+
     return (
         <ScrollView contentContainerStyle={styles.container}>
-            <View style={styles.imagePlaceholder}>
-                <Text style={styles.imageText}>Card Title</Text>
-                <Text style={styles.imageSub}>Secondary text</Text>
-            </View>
+
+            <Button title = "Scegli immagine" onPress={pickImage}/>
+
+            {
+                imageUri ? (
+                    <Image
+                        source = {{ uri: imageUri }}
+                        style = {{ width:200, height: 200, marginTop: 10, alignSelf: 'center'}}
+                    />
+                ) : (
+                    <View style={styles.imagePlaceholder}>
+                        <Text style={styles.imageText}>Nessuna immagine selezionata</Text>
+                    </View>
+                    )
+            }
+            
 
             <View style={styles.row}>
                 <View style={styles.inputGroup}>
