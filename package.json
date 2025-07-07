@@ -15,10 +15,10 @@
     "@react-navigation/native-stack": "^7.3.21",
     "expo": "~53.0.15",
     "expo-module-scripts": "^4.1.9",
-    "expo-sqlite": "~15.2.13",
     "expo-status-bar": "~2.2.3",
     "react": "19.0.0",
-    "react-native": "0.79.4"
+    "react-native": "0.79.4",
+    "expo-sqlite": "~15.2.14"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

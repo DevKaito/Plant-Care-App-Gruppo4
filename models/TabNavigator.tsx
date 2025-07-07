@@ -10,7 +10,7 @@ const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
   return (
-    <Tab.Navigator backBehavior='history'>
+    <Tab.Navigator backBehavior='history' initialRouteName='Home'>
       <Tab.Screen name="Home" component={HomeTab} />
       <Tab.Screen name="My Plants" component={MyPlantsStackNavigator} />
       <Tab.Screen name="Search" component={SearchTab} />

@@ -35,16 +35,20 @@ const MyPlantsTab = () => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <Text style={styles.title}></Text>
-            
+            <Text style={styles.title}>Le mie piante</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('CategoriesScreen')}>
+                <Text style={{fontSize: 20, fontWeight: 'bold', backgroundColor: '#4CAF50'}}>Categorie</Text>
+            </TouchableOpacity>
             <FlatList
                 data={plants}
+                horizontal
                 keyExtractor={(item) => item.key.toString()}
                 renderItem={item => (
-                    <View>
+                    <TouchableOpacity style={{padding:12}} onPress={() => navigation.navigate('PlantDetailScreen', { plantId: item.item.key })}>
+                        <Image source={{uri:"https://img.icons8.com/ios-filled/50/potted-plant.png"}} style={{width:50, height:50}}></Image>
                         <Text>{item.item.name}</Text>
                         <Text>{item.item.species}</Text>
-                    </View>
+                    </TouchableOpacity>
                 )}
                 contentContainerStyle={styles.list}
             />
