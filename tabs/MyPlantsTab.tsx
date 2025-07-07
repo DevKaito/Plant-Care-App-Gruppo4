@@ -19,19 +19,24 @@ const MyPlantsTab = () => {
     const [plants, setPlants] = useState<Plant[]>([]);
 
     useEffect(() => {
-        const loadPlants = async () => {
-            try {
-                console.log('Loading plants...');
-                const db = await getConnection();
-                await createTable(db);
-                const plantData = await getPlants(db);
-                setPlants(plantData);
-            } catch (error) {
-                console.error('Error loading plants:', error);
-            }
-        }
-        loadPlants();
-    }, []);
+        const focus = navigation.addListener('focus', () => {
+            const loadPlants = async () => {
+                try {
+                    console.log('Loading plants...');
+                    const db = await getConnection();
+                    await createTable(db);
+                    const plantData = await getPlants(db);
+                    setPlants(plantData);
+                } catch (error) {
+                    console.error('Error loading plants:', error);
+                }
+            };
+            
+            loadPlants();
+        });
+
+        return focus;
+    },[navigation]);
 
     return (
         <SafeAreaView style={styles.container}>

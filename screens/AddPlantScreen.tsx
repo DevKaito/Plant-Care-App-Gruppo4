@@ -9,6 +9,8 @@ import {
     ScrollView,
     Alert,
 } from 'react-native';
+import { insertPlant, getConnection } from '../db';
+import { Plant, PlantState } from '../models/Plant';
 import { useNavigation } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -38,21 +40,27 @@ const AddPlantScreen = () => {
         setNotes('');
     };
 
-    const handleSave = () => {
-        Alert.alert('Salvato', 'Pianta aggiunta con successo!');
-        console.log({
-            name,
-            species,
-            acquisitionDate,
-            pruning,
-            repotting,
-            watering,
-            status,
-            notes,
-        });
+    const handleSave = async() => {
+        try{
+            const db = await getConnection();
 
-        resetForm();
-        navigation.goBack();
+            const newPlant = {
+                name: name.trim(),
+                species: species.trim(),
+                ownedSince: acquisitionDate ? new Date(acquisitionDate) : new Date(),
+                waterFrequency: watering ? parseInt(watering) : 0,
+                repotFrequency: repotting ? parseInt(repotting) : 0,
+                pruneFrequency: pruning ? parseInt(pruning) : 0,
+                state: status as PlantState,
+                image: '',
+            };
+            await insertPlant(db, newPlant);
+            resetForm();
+            navigation.goBack();
+        } catch(error){
+            console.error('Errore: ', error);
+            Alert.alert('Errore, impossibile salvare la pianta!');
+        }
     };
 
     const handleCancel = () => {
@@ -117,7 +125,7 @@ const AddPlantScreen = () => {
                         display="default"
                         onChange={handleDateChange}
                         maximumDate={new Date()}
-                    />
+                />
                 )}
             </View>
 
