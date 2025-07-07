@@ -46,16 +46,15 @@ const MyPlantsTab = () => {
             </TouchableOpacity>
             <FlatList
                 data={plants}
-                horizontal
+                numColumns={3}
                 keyExtractor={(item) => item.key.toString()}
                 renderItem={item => (
-                    <TouchableOpacity style={{padding:12}} onPress={() => navigation.navigate('PlantDetailScreen', { plantId: item.item.key })}>
+                    <TouchableOpacity style={styles.plantCard} onPress={() => navigation.navigate('PlantDetailScreen', { plantId: item.item.key })}>
                         <Image source={{uri:"https://img.icons8.com/ios-filled/50/potted-plant.png"}} style={{width:50, height:50}}></Image>
                         <Text>{item.item.name}</Text>
                         <Text>{item.item.species}</Text>
                     </TouchableOpacity>
                 )}
-                contentContainerStyle={styles.list}
             />
 
             <TouchableOpacity
@@ -77,38 +76,29 @@ const styles = StyleSheet.create({
         padding: 16,
     },
     title: {
-        fontSize: 20,
+        fontSize: 32,
         fontWeight: 'bold',
-        marginBottom: 16,
+        margin: 10,
         textAlign: 'center',
     },
-    list: {
-        paddingBottom: 100,
-    },
-    plantItem: {
-        padding: 12,
-        backgroundColor: '#e6ffe6',
-        borderRadius: 8,
-        marginBottom: 10,
-    },
-    plantName: {
-        fontSize: 16,
-    },
     addButton: {
-        position: 'absolute',
-        right: 20,
-        bottom: 90,
+        alignSelf: 'flex-end',
+        margin: 24,
         backgroundColor: '#4CAF50',
         width: 50,
         height: 50,
         borderRadius: 25,
         alignItems: 'center',
         justifyContent: 'center',
-        elevation: 5,
     },
     addText: {
         color: '#fff',
         fontSize: 28,
         fontWeight: 'bold',
+    },
+    plantCard: {
+        paddingTop: 36,
+        width: '33.33%',
+        alignItems: 'center',
     },
 });
