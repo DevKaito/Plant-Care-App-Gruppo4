@@ -1,5 +1,5 @@
 // npm install @react-native-picker/picker (picker immagini (non funziona per ora)), npm install @react-navigation/native-stack () , npx expo install @expo/vector-icons (per le icone)
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Image,
@@ -11,15 +11,17 @@ import {
     ScrollView,
     Alert,
 } from 'react-native';
-import { insertPlant, getConnection } from '../db';
+import { insertPlant, updatePlant, getConnection } from '../db';
 import { Plant, PlantState } from '../models/Plant';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 
 const AddPlantScreen = () => {
     const navigation = useNavigation<any>();
+    const route = useRoute<any>();
+    const plantToEdit = route.params?.plantData;
 
     const [name, setName] = useState('');
     const [species, setSpecies] = useState('');
@@ -31,7 +33,21 @@ const AddPlantScreen = () => {
     const [notes, setNotes] = useState('');
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [date, setDate] = useState(new Date());
-    const [imageUri, setImageUri] = useState<string | null> (null);
+    const [imageUri, setImageUri] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (plantToEdit) {
+            setName(plantToEdit.name || '');
+            setSpecies(plantToEdit.species || '');
+            setAcquisitionDate(plantToEdit.acquisitionDate?.split('T')[0] || '');
+            setPruning(String(plantToEdit.pruning || ''));
+            setRepotting(String(plantToEdit.repotting || ''));
+            setWatering(String(plantToEdit.watering || ''));
+            setStatus(plantToEdit.status || 'sana');
+            setNotes(plantToEdit.notes || '');
+            setImageUri(plantToEdit.image || null);
+        }
+    }, []);
 
     const resetForm = () => {
         setName('');
@@ -42,13 +58,15 @@ const AddPlantScreen = () => {
         setWatering('');
         setStatus('sana');
         setNotes('');
+        setImageUri(null);
     };
 
-    const handleSave = async() => {
-        try{
+    const handleSave = async () => {
+        try {
             const db = await getConnection();
 
             const newPlant = {
+                key: plantToEdit?.key,
                 name: name.trim(),
                 species: species.trim(),
                 ownedSince: acquisitionDate ? new Date(acquisitionDate) : new Date(),
@@ -56,12 +74,19 @@ const AddPlantScreen = () => {
                 repotFrequency: repotting ? parseInt(repotting) : 0,
                 pruneFrequency: pruning ? parseInt(pruning) : 0,
                 state: status as PlantState,
-                image: imageUri ?? '', //se la variabile è null setta '' come immagine
+                image: imageUri ?? '',
+                notes: notes,
             };
-            await insertPlant(db, newPlant);
+
+            if (plantToEdit) {
+                await updatePlant(db, newPlant);
+            } else {
+                await insertPlant(db, newPlant);
+            }
+
             resetForm();
             navigation.goBack();
-        } catch(error){
+        } catch (error) {
             console.error('Errore: ', error);
             Alert.alert('Errore, impossibile salvare la pianta!');
         }
@@ -89,29 +114,25 @@ const AddPlantScreen = () => {
             quality: 1,
         });
 
-        if (!result.canceled){
+        if (!result.canceled) {
             setImageUri(result.assets[0].uri);
         }
-    }
+    };
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
+            <Button title="Scegli immagine" onPress={pickImage} />
 
-            <Button title = "Scegli immagine" onPress={pickImage}/>
-
-            {
-                imageUri ? (
-                    <Image
-                        source = {{ uri: imageUri }}
-                        style = {{ width:200, height: 200, marginTop: 10, alignSelf: 'center'}}
-                    />
-                ) : (
-                    <View style={styles.imagePlaceholder}>
-                        <Text style={styles.imageText}>Nessuna immagine selezionata</Text>
-                    </View>
-                    )
-            }
-            
+            {imageUri ? (
+                <Image
+                    source={{ uri: imageUri }}
+                    style={{ width: 200, height: 200, marginTop: 10, alignSelf: 'center' }}
+                />
+            ) : (
+                <View style={styles.imagePlaceholder}>
+                    <Text style={styles.imageText}>Nessuna immagine selezionata</Text>
+                </View>
+            )}
 
             <View style={styles.row}>
                 <View style={styles.inputGroup}>
@@ -133,7 +154,7 @@ const AddPlantScreen = () => {
                         style={styles.input}
                         value={species}
                         onChangeText={(text) => {
-                            if (/^[a-zA-ZÀ-ÿ\s]*$/.test(text)) { 
+                            if (/^[a-zA-ZÀ-ÿ\s]*$/.test(text)) {
                                 setSpecies(text);
                             }
                         }}
@@ -145,7 +166,9 @@ const AddPlantScreen = () => {
             <View style={styles.inputGroup}>
                 <Text>Data acquisizione:</Text>
                 <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.input}>
-                    <Text style={{ color: acquisitionDate ? 'black' : 'gray' }}>{acquisitionDate || 'Seleziona una data'}</Text>
+                    <Text style={{ color: acquisitionDate ? 'black' : 'gray' }}>
+                        {acquisitionDate || 'Seleziona una data'}
+                    </Text>
                 </TouchableOpacity>
                 {showDatePicker && (
                     <DateTimePicker
@@ -154,7 +177,7 @@ const AddPlantScreen = () => {
                         display="default"
                         onChange={handleDateChange}
                         maximumDate={new Date()}
-                />
+                    />
                 )}
             </View>
 
@@ -241,9 +264,6 @@ const styles = StyleSheet.create({
     },
     imageText: {
         fontWeight: 'bold',
-    },
-    imageSub: {
-        color: '#444',
     },
     row: {
         flexDirection: 'row',
