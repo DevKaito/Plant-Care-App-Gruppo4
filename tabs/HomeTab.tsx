@@ -23,7 +23,7 @@ const dummyPlants: Plant[] = [
     { id: 'p5', name: 'Nome p3', image: 'https://cdn-icons-png.flaticon.com/128/3800/3800257.png' },
 ];
 
-const HomeScreen: React.FC = () => {
+const HomeTab: React.FC = () => {
     const renderPlantItem = ({ item }: { item: Plant }) => (
         <View style={styles.row}>
             <View style={styles.idBox}>
@@ -82,7 +82,7 @@ const HomeScreen: React.FC = () => {
     );
 };
 
-export default HomeScreen;
+export default HomeTab;
 
 const styles = StyleSheet.create({
     container: {
@@ -170,5 +170,6 @@ const styles = StyleSheet.create({
         height: 48,
     }
 });
+
 
 

@@ -4,12 +4,14 @@ export enum PlantState {
     ToCheck = "To Check"
 }
 
-export interface Plant{
+export type Plant = {
     key: number;
-    name?: string;
+    name: string;
     species: string;
     ownedSince: Date;
     waterFrequency: number;
-    image?: string;
+    repotFrequency: number;
+    pruneFrequency: number;
+    image: string;
     state: PlantState;
 }
