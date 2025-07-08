@@ -39,11 +39,11 @@ const AddPlantScreen = () => {
         if (plantToEdit) {
             setName(plantToEdit.name || '');
             setSpecies(plantToEdit.species || '');
-            setAcquisitionDate(plantToEdit.acquisitionDate?.split('T')[0] || '');
-            setPruning(String(plantToEdit.pruning || ''));
-            setRepotting(String(plantToEdit.repotting || ''));
-            setWatering(String(plantToEdit.watering || ''));
-            setStatus(plantToEdit.status || 'sana');
+            setAcquisitionDate(plantToEdit.ownedSince? new Date(plantToEdit.ownedSince).toISOString().split('T')[0] : '');
+            setPruning(String(plantToEdit.pruneFrequency || ''));
+            setRepotting(String(plantToEdit.repotFrequency || ''));
+            setWatering(String(plantToEdit.waterFrequency || ''));
+            setStatus(plantToEdit.state || 'sana');
             setNotes(plantToEdit.notes || '');
             setImageUri(plantToEdit.image || null);
         }
