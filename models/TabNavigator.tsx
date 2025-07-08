@@ -5,13 +5,14 @@ import MyPlantsTab from '../tabs/MyPlantsTab';
 import SearchTab from '../tabs/SearchTab';
 import AnalyticsTab from '../tabs/AnalyticsTab';
 import MyPlantsStackNavigator from './MyPlantsStackNavigator';
+import HomeStackNavigator from './HomeStackNavigator';
 
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
   return (
     <Tab.Navigator backBehavior='history' initialRouteName='Home'>
-      <Tab.Screen name="Home" component={HomeTab} />
+      <Tab.Screen name="Home" component={HomeStackNavigator} />
       <Tab.Screen name="My Plants" component={MyPlantsStackNavigator} />
       <Tab.Screen name="Search" component={SearchTab} />
       <Tab.Screen name="Analysis" component={AnalyticsTab} />

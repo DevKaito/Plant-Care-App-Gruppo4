@@ -64,7 +64,7 @@ const AddPlantScreen = () => {
     const handleSave = async () => {
        
         if (!name.trim() || !species.trim() || !acquisitionDate || !watering || !repotting || !pruning) {
-            Alert.alert('Errore', 'Compila tutti i campi obbligatori!');
+            Alert.alert('Errore', 'Compila tutti i campi obbligatori! (*)');
             return;
         }
 
@@ -142,7 +142,7 @@ const AddPlantScreen = () => {
 
             <View style={styles.row}>
                 <View style={styles.inputGroup}>
-                    <Text>Nome:</Text>
+                    <Text>Nome*:</Text>
                     <TextInput
                         style={styles.input}
                         value={name}
@@ -155,7 +155,7 @@ const AddPlantScreen = () => {
                     />
                 </View>
                 <View style={styles.inputGroup}>
-                    <Text>Specie:</Text>
+                    <Text>Specie*:</Text>
                     <TextInput
                         style={styles.input}
                         value={species}
@@ -170,7 +170,7 @@ const AddPlantScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-                <Text>Data acquisizione:</Text>
+                <Text>Data acquisizione*:</Text>
                 <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.input}>
                     <Text style={{ color: acquisitionDate ? 'black' : 'gray' }}>
                         {acquisitionDate || 'Seleziona una data'}
@@ -188,7 +188,7 @@ const AddPlantScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-                <Text>Frequenza potatura:</Text>
+                <Text>Frequenza potatura*:</Text>
                 <TextInput
                     style={styles.input}
                     keyboardType="numeric"
@@ -199,7 +199,7 @@ const AddPlantScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-                <Text>Frequenza rinvaso:</Text>
+                <Text>Frequenza rinvaso*:</Text>
                 <TextInput
                     style={styles.input}
                     keyboardType="numeric"
@@ -210,7 +210,7 @@ const AddPlantScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-                <Text>Frequenza innaffiatura:</Text>
+                <Text>Frequenza innaffiatura*:</Text>
                 <TextInput
                     style={styles.input}
                     keyboardType="numeric"
@@ -221,7 +221,7 @@ const AddPlantScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-                <Text>Stato della pianta:</Text>
+                <Text>Stato della pianta*:</Text>
                 <View style={styles.pickerContainer}>
                     <Picker selectedValue={status} onValueChange={(itemValue) => setStatus(itemValue)}>
                         <Picker.Item label="Sana" value="sana" />

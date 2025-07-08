@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { Plant, PlantState } from '../models/Plant';
 import { useNavigation } from '@react-navigation/native';
-import { createTable, deleteAllPlants, getConnection, getPlants, insertPlant } from '../db';
+import { createTable, deleteAllPlants, deleteTable, getConnection, getPlants, insertPlant } from '../db';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MyPlantsStackParamList } from '../models/MyPlantsStackNavigator';
 
@@ -22,7 +22,6 @@ const MyPlantsTab = () => {
         const focus = navigation.addListener('focus', () => {
             const loadPlants = async () => {
                 try {
-                    console.log('Loading plants...');
                     const db = await getConnection();
                     const plantData = await getPlants(db);
                     setPlants(plantData);
@@ -58,7 +57,7 @@ const MyPlantsTab = () => {
                         onPress={() => navigation.navigate('PlantDetailScreen', item)}
                     >
                         <Image
-                            source={{ uri: item.image || 'https://img.icons8.com/ios-filled/50/potted-plant.png' }}
+                            source={{ uri: item.image }}
                             style={{ width: 50, height: 50 }}
                         />
                         <Text>{item.name}</Text>

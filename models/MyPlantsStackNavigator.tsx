@@ -5,12 +5,12 @@ import MyPlantsTab from '../tabs/MyPlantsTab';
 import AddPlantScreen from '../screens/AddPlantScreen';
 import PlantDetailScreen from '../screens/PlantDetailScreen';
 import CategoriesScreen from '../screens/CategoriesScreen';
-import { Plant } from '../models/Plant'; // IMPORTANTE
+import { Plant } from '../models/Plant';
 
 export type MyPlantsStackParamList = {
   MyPlantsTab: undefined;
   AddPlantScreen: undefined;
-  PlantDetailScreen: Plant; // CAMBIATO QUI
+  PlantDetailScreen: Plant;
   CategoriesScreen: undefined;
 };
 

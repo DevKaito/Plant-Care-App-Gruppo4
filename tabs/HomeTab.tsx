@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     Text,
@@ -8,76 +8,78 @@ import {
     Image,
     SafeAreaView,
 } from 'react-native';
+import { Plant } from '../models/Plant';
+import { getConnection, getPlants, getRecentPlants } from '../db';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { HomeStackParamList } from '../models/HomeStackNavigator';
 
-type Plant = {
-    id: string;
-    name: string;
-    image: string;
-};
+// type Plant = {
+//     id: string;
+//     name: string;
+//     image: string;
+// };
 
-const dummyPlants: Plant[] = [
-    { id: 'p1', name: 'Mimosa sensitiva', image: 'https://cdn-icons-png.flaticon.com/128/3800/3800257.png' },
-    { id: 'p2', name: 'Nome p2', image: 'https://cdn-icons-png.flaticon.com/128/3800/3800257.png' },
-    { id: 'p3', name: 'Nome p3', image: 'https://cdn-icons-png.flaticon.com/128/3800/3800257.png' },
-    { id: 'p4', name: 'Nome p3', image: 'https://cdn-icons-png.flaticon.com/128/3800/3800257.png' },
-    { id: 'p5', name: 'Nome p3', image: 'https://cdn-icons-png.flaticon.com/128/3800/3800257.png' },
-];
+// const dummyPlants: Plant[] = [
+//     { id: 'p1', name: 'Mimosa sensitiva', image: 'https://cdn-icons-png.flaticon.com/128/3800/3800257.png' },
+//     { id: 'p2', name: 'Nome p2', image: 'https://cdn-icons-png.flaticon.com/128/3800/3800257.png' },
+//     { id: 'p3', name: 'Nome p3', image: 'https://cdn-icons-png.flaticon.com/128/3800/3800257.png' },
+//     { id: 'p4', name: 'Nome p3', image: 'https://cdn-icons-png.flaticon.com/128/3800/3800257.png' },
+//     { id: 'p5', name: 'Nome p3', image: 'https://cdn-icons-png.flaticon.com/128/3800/3800257.png' },
+// ];
 
-const HomeTab: React.FC = () => {
-    const renderPlantItem = ({ item }: { item: Plant }) => (
-        <View style={styles.row}>
-            <View style={styles.idBox}>
-                <Image
-                        source={{ uri: item.image }}
-                        style={styles.boxImage}
-                    />
-            </View>
-            <View style={styles.nameBox}>
-                <Text style={styles.nameText}>{item.name}</Text>
-            </View>
-            <TouchableOpacity style={styles.curaButton}>
-                <Text style={styles.curaText}>Cura</Text>
-            </TouchableOpacity>
-        </View>
-    );
+const HomeTab = () => {
+    const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
+    const [plants, setPlants] = useState<Plant[]>([]);
 
+    useEffect(() => {
+        const focus = navigation.addListener('focus', () => {
+            const loadRecentPlants = async () => {
+            try{
+                console.log('Caricamento piante recenti...');
+                const db = await getConnection();
+                const recentPlants = await getRecentPlants(db);
+                setPlants(recentPlants);
+            }
+            catch (error) {
+                console.error('Errore nel caricamento delle piante recenti:', error);
+            }
+        };
+            loadRecentPlants();
+        });
+        return focus;
+    }, []);
+    
     return (
         <SafeAreaView style={styles.container}>
             <Text style={styles.header}>Plant Care App</Text>
 
             <Text style={styles.sectionTitle}>Piante aggiunte di recente</Text>
 
-            <View style={styles.categoryRow}>
-                <View style={styles.categoryItem}>
-                    <Image
-                        source={{ uri: 'https://cdn-icons-png.flaticon.com/128/882/882968.png' }}
-                        style={styles.categoryImage}
-                    />
-                    <Text style={styles.categoryText}>Cactus</Text>
-                </View>
-                <View style={styles.categoryItem}>
-                    <Image
-                        source={{ uri: 'https://cdn-icons-png.flaticon.com/128/2220/2220105.png' }}
-                        style={styles.categoryImage}
-                    />
-                    <Text style={styles.categoryText}>Palma</Text>
-                </View>
-                <View style={styles.categoryItem}>
-                    <Image
-                        source={{ uri: 'https://cdn-icons-png.flaticon.com/128/2362/2362691.png' }}
-                        style={styles.categoryImage}
-                    />
-                    <Text style={styles.categoryText}>Bonsai</Text>
-                </View>
-            </View>
+            <FlatList
+                data={plants}
+                keyExtractor={(item) => item.key.toString()}
+                renderItem={({ item }) => (
+                    <TouchableOpacity onPress={() => navigation.navigate('PlantDetailScreen', item)}>
+                        <Image source={{uri: item.image}} style={{width: 100, height: 100}}></Image>
+                        <Text>{item.name}</Text>
+                        <Text>{item.species}</Text>
+                    </TouchableOpacity>
+                )}
+            />
 
             <View style={styles.boxContainer}>
                 <FlatList
-                    data={dummyPlants}
-                    keyExtractor={(item) => item.id}
-                    renderItem={renderPlantItem}
+                    data={plants}
+                    keyExtractor={(item) => item.key.toString()}
+                    renderItem={({ item }) => (
+                        <View>
+                            <Text>{item.name}</Text>
+                            <Text>{item.species}</Text>
+                        </View> 
+                    )}
                 />
-            </View>
+            </View> 
         </SafeAreaView>
     );
 };
