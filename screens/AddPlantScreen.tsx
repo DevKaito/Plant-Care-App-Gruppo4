@@ -62,12 +62,12 @@ const AddPlantScreen = () => {
     };
 
     const handleSave = async () => {
-       
+
         if (!name.trim() || !species.trim() || !acquisitionDate || !watering || !repotting || !pruning) {
             Alert.alert('Errore', 'Compila tutti i campi obbligatori! (*)');
             return;
         }
-
+        
         try {
             const db = await getConnection();
 
@@ -75,11 +75,11 @@ const AddPlantScreen = () => {
                 key: plantToEdit?.key,
                 name: name.trim(),
                 species: species.trim(),
-                ownedSince: acquisitionDate ? new Date(acquisitionDate) : new Date(),
+                ownedSince: new Date(acquisitionDate),
                 waterFrequency: watering ? parseInt(watering) : 0,
                 repotFrequency: repotting ? parseInt(repotting) : 0,
                 pruneFrequency: pruning ? parseInt(pruning) : 0,
-                state: status as unknown as PlantState,
+                state: status as PlantState,
                 image: imageUri ?? '',
                 notes: notes,
             };

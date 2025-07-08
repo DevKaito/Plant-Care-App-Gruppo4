@@ -29,7 +29,6 @@ const MyPlantsTab = () => {
                     console.error('Errore caricamento piante:', error);
                 }
             };
-            
             loadPlants();
         });
 
