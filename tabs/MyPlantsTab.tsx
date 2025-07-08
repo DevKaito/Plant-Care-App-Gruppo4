@@ -27,7 +27,7 @@ const MyPlantsTab = () => {
                     const plantData = await getPlants(db);
                     setPlants(plantData);
                 } catch (error) {
-                    console.error('Error loading plants:', error);
+                    console.error('Errore caricamento piante:', error);
                 }
             };
             
@@ -35,23 +35,34 @@ const MyPlantsTab = () => {
         });
 
         return focus;
-    },[navigation]);
+    }, [navigation]);
 
     return (
         <SafeAreaView style={styles.container}>
             <Text style={styles.title}>Le mie piante</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('CategoriesScreen')}>
-                <Text style={{fontSize: 20, fontWeight: 'bold', backgroundColor: '#4CAF50'}}>Categorie</Text>
+
+            <TouchableOpacity
+                style={styles.categoryButton}
+                onPress={() => navigation.navigate('CategoriesScreen')}
+            >
+                <Text style={styles.categoryButtonText}>Categorie</Text>
             </TouchableOpacity>
+
             <FlatList
                 data={plants}
                 numColumns={3}
                 keyExtractor={(item) => item.key.toString()}
-                renderItem={item => (
-                    <TouchableOpacity style={styles.plantCard} onPress={() => navigation.navigate('PlantDetailScreen', { plantId: item.item.key })}>
-                        <Image source={{uri:"https://img.icons8.com/ios-filled/50/potted-plant.png"}} style={{width:50, height:50}}></Image>
-                        <Text>{item.item.name}</Text>
-                        <Text>{item.item.species}</Text>
+                renderItem={({ item }) => (
+                    <TouchableOpacity
+                        style={styles.plantCard}
+                        onPress={() => navigation.navigate('PlantDetailScreen', item)}
+                    >
+                        <Image
+                            source={{ uri: item.image || 'https://img.icons8.com/ios-filled/50/potted-plant.png' }}
+                            style={{ width: 50, height: 50 }}
+                        />
+                        <Text>{item.name}</Text>
+                        <Text>{item.species}</Text>
                     </TouchableOpacity>
                 )}
             />
@@ -77,8 +88,20 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 32,
         fontWeight: 'bold',
-        margin: 10,
+        marginBottom: 16,
         textAlign: 'center',
+    },
+    categoryButton: {
+        backgroundColor: '#4CAF50',
+        padding: 10,
+        borderRadius: 12,
+        alignSelf: 'center',
+        marginBottom: 16,
+    },
+    categoryButtonText: {
+        color: 'white',
+        fontSize: 18,
+        fontWeight: 'bold',
     },
     addButton: {
         alignSelf: 'flex-end',
@@ -101,3 +124,4 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
 });
+

@@ -1,10 +1,8 @@
-export enum PlantState {
-    Healthy = "Healthy",
-    Sick = "Sick",
-    ToCheck = "To Check"
+export enum PlantState{
+    'Healthy', 'To Check', 'Sick'
 }
 
-export type Plant = {
+export interface Plant {
     key: number;
     name: string;
     species: string;
@@ -14,4 +12,5 @@ export type Plant = {
     pruneFrequency: number;
     image: string;
     state: PlantState;
+    notes: string;
 }
