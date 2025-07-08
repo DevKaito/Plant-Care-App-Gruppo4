@@ -73,7 +73,7 @@ const AddPlantScreen = () => {
                 waterFrequency: watering ? parseInt(watering) : 0,
                 repotFrequency: repotting ? parseInt(repotting) : 0,
                 pruneFrequency: pruning ? parseInt(pruning) : 0,
-                state: status as PlantState,
+                state: status as unknown as PlantState,
                 image: imageUri ?? '',
                 notes: notes,
             };
