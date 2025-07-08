@@ -62,12 +62,6 @@ const AddPlantScreen = () => {
     };
 
     const handleSave = async () => {
-       
-        if (!name.trim() || !species.trim() || !acquisitionDate || !watering || !repotting || !pruning) {
-            Alert.alert('Errore', 'Compila tutti i campi obbligatori!');
-            return;
-        }
-
         try {
             const db = await getConnection();
 
@@ -75,11 +69,11 @@ const AddPlantScreen = () => {
                 key: plantToEdit?.key,
                 name: name.trim(),
                 species: species.trim(),
-                ownedSince: acquisitionDate ? new Date(acquisitionDate) : new Date(),
+                ownedSince: new Date(acquisitionDate),
                 waterFrequency: watering ? parseInt(watering) : 0,
                 repotFrequency: repotting ? parseInt(repotting) : 0,
                 pruneFrequency: pruning ? parseInt(pruning) : 0,
-                state: status as unknown as PlantState,
+                state: status as PlantState,
                 image: imageUri ?? '',
                 notes: notes,
             };
@@ -188,7 +182,7 @@ const AddPlantScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-                <Text>Frequenza potatura:</Text>
+                <Text>Frequenza potatura (in giorni):</Text>
                 <TextInput
                     style={styles.input}
                     keyboardType="numeric"
@@ -199,7 +193,7 @@ const AddPlantScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-                <Text>Frequenza rinvaso:</Text>
+                <Text>Frequenza rinvaso (in giorni):</Text>
                 <TextInput
                     style={styles.input}
                     keyboardType="numeric"
@@ -210,7 +204,7 @@ const AddPlantScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-                <Text>Frequenza innaffiatura:</Text>
+                <Text>Frequenza innaffiatura (in giorni):</Text>
                 <TextInput
                     style={styles.input}
                     keyboardType="numeric"

@@ -50,7 +50,7 @@ export default function PlantDetailScreen({ route }: { route: any }) {
             <Text style={styles.title}>Dettaglio Pianta</Text>
             <Text style={styles.label}>🌱 Nome: <Text style={styles.value}>{plant.name}</Text></Text>
             <Text style={styles.label}>🔖 Specie: <Text style={styles.value}>{plant.species}</Text></Text>
-            <Text style={styles.label}>📅 Acquisizione: <Text style={styles.value}>{plant.ownedSince?.toString().split('T')[0]}</Text></Text>
+            <Text style={styles.label}>📅 Acquisizione: <Text style={styles.value}>{new Date(plant.ownedSince).toISOString().split('T')[0]}</Text></Text>
             <Text style={styles.label}>💧 Innaffiatura: <Text style={styles.value}>{plant.waterFrequency} giorni</Text></Text>
             <Text style={styles.label}>🌿 Potatura: <Text style={styles.value}>{plant.pruneFrequency} giorni</Text></Text>
             <Text style={styles.label}>🪴 Rinvaso: <Text style={styles.value}>{plant.repotFrequency} giorni</Text></Text>

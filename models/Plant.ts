@@ -1,5 +1,7 @@
 export enum PlantState{
-    'Healthy', 'To Check', 'Sick'
+    Healthy = 'Healthy', 
+    ToCheck = 'To Check', 
+    Sick = 'Sick'
 }
 
 export interface Plant {
