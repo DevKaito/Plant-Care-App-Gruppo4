@@ -62,6 +62,12 @@ const AddPlantScreen = () => {
     };
 
     const handleSave = async () => {
+       
+        if (!name.trim() || !species.trim() || !acquisitionDate || !watering || !repotting || !pruning) {
+            Alert.alert('Errore', 'Compila tutti i campi obbligatori!');
+            return;
+        }
+
         try {
             const db = await getConnection();
 
