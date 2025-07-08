@@ -28,24 +28,38 @@ import { HomeStackParamList } from '../models/HomeStackNavigator';
 //     { id: 'p5', name: 'Nome p3', image: 'https://cdn-icons-png.flaticon.com/128/3800/3800257.png' },
 // ];
 
+/*const getMotivation = (item: Plant): string => {
+    const needs: string[] = [];
+
+    if (item.waterFrequency === 0) needs.push('va innaffiata');
+    if (item.pruneFrequency === 0) needs.push('va potata');
+    if (item.repotFrequency === 0) needs.push('va rinvasata');
+    return needs.join(', ');
+};*/
+
 const HomeTab = () => {
     const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
     const [plants, setPlants] = useState<Plant[]>([]);
+    const [curablePlants, setCurablePlants] = useState<Plant[]>([]);
 
     useEffect(() => {
         const focus = navigation.addListener('focus', () => {
-            const loadRecentPlants = async () => {
+            const loadPlants = async () => {
             try{
                 console.log('Caricamento piante recenti...');
                 const db = await getConnection();
+
                 const recentPlants = await getRecentPlants(db);
                 setPlants(recentPlants);
+
+                const curablePlantList = await getPlants(db);
+                setCurablePlants(curablePlantList);
             }
             catch (error) {
                 console.error('Errore nel caricamento delle piante recenti:', error);
             }
         };
-            loadRecentPlants();
+            loadPlants();
         });
         return focus;
     }, []);
@@ -54,32 +68,54 @@ const HomeTab = () => {
         <SafeAreaView style={styles.container}>
             <Text style={styles.header}>Plant Care App</Text>
 
-            <Text style={styles.sectionTitle}>Piante aggiunte di recente</Text>
+            <Text style={styles.sectionTitle}>Recently added plants</Text>
 
             <FlatList
-                data={plants}
+                data={plants.slice(0, 3)}
+                horizontal
+                showsHorizontalScrollIndicator={false}
                 keyExtractor={(item) => item.key.toString()}
+                contentContainerStyle={[
+                    styles.plantListContainer,
+                    {
+                        justifyContent:
+                            plants.length === 1 ? 'center' :
+                            plants.length === 2 ? 'space-evenly' :
+                            'space-between',
+                            paddingHorizontal: plants.length === 1 ? 0 : 16,
+                    }
+                ]}
                 renderItem={({ item }) => (
-                    <TouchableOpacity onPress={() => navigation.navigate('PlantDetailScreen', item)}>
-                        <Image source={{uri: item.image}} style={{width: 100, height: 100}}></Image>
-                        <Text>{item.name}</Text>
-                        <Text>{item.species}</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate('PlantDetailScreen', item)} style={styles.plantCard}>
+                        <Image source={{uri: item.image}} style={styles.plantImage}></Image>
+                        <Text style={styles.plantName}>{item.name}</Text>
+                        <Text style={styles.plantSpecies}>{item.species}</Text>
                     </TouchableOpacity>
                 )}
             />
 
             <View style={styles.boxContainer}>
                 <FlatList
-                    data={plants}
+                    data={curablePlants}
                     keyExtractor={(item) => item.key.toString()}
                     renderItem={({ item }) => (
-                        <View>
-                            <Text>{item.name}</Text>
-                            <Text>{item.species}</Text>
-                        </View> 
+                        <View style={styles.itemContainer}>
+                            <Image source={{ uri: item.image }} style={styles.image} />
+                
+                        <View style={styles.textContainer}>
+                            <Text style={styles.name}>{item.name}</Text>
+                            <Text style={styles.species}>{item.species}</Text>
+                            <Text style={styles.illness}>Motivation: {item.name}</Text>   {/* item.name è provvisorio, ci va la motivazione della cura (va potata, innaffiata ecc o direttamente è malata/da controllare) */}
+                        </View>
+
+                        <TouchableOpacity style={styles.button}>
+                            <Text style={styles.buttonText}>Cure</Text>
+                        </TouchableOpacity>
+                    </View>
                     )}
                 />
-            </View> 
+            </View>
+
         </SafeAreaView>
     );
 };
@@ -105,24 +141,7 @@ const styles = StyleSheet.create({
         marginTop: 48,
         marginBottom: 32,
     },
-    categoryRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        marginBottom: 16,
-    },
-    categoryItem: {
-        alignItems: 'center',
-        marginBottom: 24,
-    },
-    categoryImage: {
-        width: 64,
-        height: 64,
-    },
-    categoryText: {
-        marginTop: 4,
-        fontSize: 16,
-        fontStyle: 'italic',
-    },
+
     boxContainer: {
         borderWidth: 3,
         borderColor: 'black',
@@ -135,43 +154,77 @@ const styles = StyleSheet.create({
         marginLeft: 30,
         maxHeight: 320,
     },
-    row: {
+    plantListContainer: {
+        flexDirection: 'row',
+        width: '100%',
+        paddingHorizontal: 0,
+    },
+    plantCard: {
+        alignItems: 'center',
+        width: 100,
+    },
+    
+    plantImage: {
+        width: 80,
+        height: 80,
+        borderRadius: 8,
+        borderWidth: 2,
+        marginBottom: 8,
+        backgroundColor: '#eee',
+    },
+
+    plantName: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+
+    plantSpecies: {
+        fontSize: 12,
+        color: '#555',
+        textAlign: 'center',
+    },
+    itemContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 10,
-    },
-    idBox: {
-        backgroundColor: 'white',
         padding: 10,
-        borderRadius: 16,
+        marginVertical: 5,
+        marginRight: 10,
+        backgroundColor: 'white',
+        borderRadius: 10,
+    },
+    image: {
+        width: 58,
+        height: 58,
+        borderRadius: 10,
         borderWidth: 2,
-        borderColor: 'black',
         marginRight: 10,
     },
-    nameBox: {
+    textContainer: {
         flex: 1,
+        justifyContent: 'center',
     },
-    nameText: {
-        fontSize: 17,
-        fontWeight: '500',
+    name: {
+        fontSize: 16,
+        fontWeight: 'bold',
     },
-    curaButton: {
+    species: {
+        fontSize: 14,
+        color: '#555',
+    },
+    button: {
         backgroundColor: '#4CAF50',
-        paddingVertical: 6,
+        paddingVertical: 8,
         paddingHorizontal: 12,
-        borderRadius: 20,
-        marginRight: 12,
+        borderRadius: 16,
     },
-    curaText: {
+    buttonText: {
         color: 'white',
         fontWeight: 'bold',
-        fontSize: 20,
+        fontSize: 16,
     },
-    boxImage: {
-        width: 48,
-        height: 48,
-    }
+    illness: {
+        fontStyle: 'italic',
+        fontSize: 12,
+    },
 });
-
-
-
