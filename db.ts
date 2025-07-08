@@ -2,7 +2,16 @@ import {Plant, PlantState} from './models/Plant';
 import * as SQLite from 'expo-sqlite';
 
 export const getConnection = async() =>{
-    return SQLite.openDatabaseAsync('db.db');
+    try{
+        const db = await SQLite.openDatabaseAsync('db.db');
+        if(!db) {
+            throw new Error('Database connection failed');
+        }
+        return db;
+    } catch (error) {
+        console.error('Error opening database:', error);
+        throw error;
+    }  
 }
 
 export const createTable = async (db: SQLite.SQLiteDatabase) => {
@@ -16,7 +25,8 @@ export const createTable = async (db: SQLite.SQLiteDatabase) => {
       repotFreq INTEGER,
       pruneFreq INTEGER,
       status TEXT,
-      image TEXT
+      image TEXT,
+      notes TEXT
     );
   `);
 };
@@ -37,7 +47,13 @@ export const deleteAllPlants = async (db: SQLite.SQLiteDatabase) => {
     await db.runAsync(deleteQuery);
 }
 
+export const deleteTable = async (db: SQLite.SQLiteDatabase) => {
+    const dropQuery = 'DROP TABLE IF EXISTS plants';
+    await db.runAsync(dropQuery);
+}
+
 export const getPlants = async (db:SQLite.SQLiteDatabase): Promise<Plant[]> => {
+    if(db){
     const selectQuery = 'SELECT * FROM plants';
     const results = await db.getAllAsync(selectQuery);
     const plants: Plant[] = [];
@@ -62,4 +78,9 @@ export const getPlants = async (db:SQLite.SQLiteDatabase): Promise<Plant[]> => {
     })
     console.log(plants);
     return plants;
+}
+    else{
+        throw new Error('Database connection is not established');
+    }
+    
 }

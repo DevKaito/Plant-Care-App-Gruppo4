@@ -24,7 +24,6 @@ const MyPlantsTab = () => {
                 try {
                     console.log('Loading plants...');
                     const db = await getConnection();
-                    await createTable(db);
                     const plantData = await getPlants(db);
                     setPlants(plantData);
                 } catch (error) {
