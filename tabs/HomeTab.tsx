@@ -152,7 +152,8 @@ const styles = StyleSheet.create({
         paddingBottom: 8,
         marginRight: 30,
         marginLeft: 30,
-        maxHeight: 320,
+        marginBottom: 20,
+        height: 320,
     },
     plantListContainer: {
         flexDirection: 'row',
