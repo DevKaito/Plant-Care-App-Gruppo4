@@ -14,20 +14,6 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { HomeStackParamList } from '../models/HomeStackNavigator';
 
-// type Plant = {
-//     id: string;
-//     name: string;
-//     image: string;
-// };
-
-// const dummyPlants: Plant[] = [
-//     { id: 'p1', name: 'Mimosa sensitiva', image: 'https://cdn-icons-png.flaticon.com/128/3800/3800257.png' },
-//     { id: 'p2', name: 'Nome p2', image: 'https://cdn-icons-png.flaticon.com/128/3800/3800257.png' },
-//     { id: 'p3', name: 'Nome p3', image: 'https://cdn-icons-png.flaticon.com/128/3800/3800257.png' },
-//     { id: 'p4', name: 'Nome p3', image: 'https://cdn-icons-png.flaticon.com/128/3800/3800257.png' },
-//     { id: 'p5', name: 'Nome p3', image: 'https://cdn-icons-png.flaticon.com/128/3800/3800257.png' },
-// ];
-
 const HomeTab = () => {
     const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
     const [plants, setPlants] = useState<Plant[]>([]);
@@ -36,7 +22,6 @@ const HomeTab = () => {
         const focus = navigation.addListener('focus', () => {
             const loadRecentPlants = async () => {
             try{
-                console.log('Caricamento piante recenti...');
                 const db = await getConnection();
                 const recentPlants = await getRecentPlants(db);
                 setPlants(recentPlants);
