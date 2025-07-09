@@ -37,3 +37,5 @@ yarn-error.*
 *.tsbuildinfo
 package.json
 package-lock.json
+package.json
+package-lock.json
