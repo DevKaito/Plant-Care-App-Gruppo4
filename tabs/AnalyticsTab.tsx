@@ -24,9 +24,9 @@ const AnalysisTab = () => {
     const countByStatus = (status: string) => plants.filter(p => p.state === status).length;
 
     const pieData = [
-        { name: 'Healthy plants', count: countByStatus('sana'), color: '#4CAF50', legendFontColor: '#333', legendFontSize: 12 },
-        { name: 'Plants to check', count: countByStatus('controllare'), color: '#FF9800', legendFontColor: '#333', legendFontSize: 12 },
-        { name: 'Sick plants', count: countByStatus('malata'), color: '#F44336', legendFontColor: '#333', legendFontSize: 12 },
+        { name: 'Healthy plants', count: countByStatus('Healthy'), color: '#4CAF50', legendFontColor: '#333', legendFontSize: 12 },
+        { name: 'Plants to check', count: countByStatus('To Check'), color: '#FF9800', legendFontColor: '#333', legendFontSize: 12 },
+        { name: 'Sick plants', count: countByStatus('Sick'), color: '#F44336', legendFontColor: '#333', legendFontSize: 12 },
     ].filter(item => item.count > 0);
 
     return (
