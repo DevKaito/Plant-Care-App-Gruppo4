@@ -26,7 +26,7 @@ export default function SearchScreen() {
         (async () => {
             const db = await getConnection();
             const allPlants = await getPlants(db);
-            const uniqueCategories = [...new Set(allPlants.map(p => p.category))];
+            const uniqueCategories = [...new Set(allPlants.map(p => p.category).filter(cat => cat && cat.trim() !== ''))];
             setCategories(uniqueCategories);
         })();
     }, []);
@@ -71,35 +71,35 @@ export default function SearchScreen() {
                 style={styles.input}
             />
 
-          <View style={styles.filterRow}>
-    <View style={styles.dropdownWrapperStatus}>
-        <Picker
-            selectedValue={statusFilter}
-            onValueChange={(itemValue) => setStatusFilter(itemValue)}
-            style={styles.dropdown}
-            dropdownIconColor="gray"
-        >
-            <Picker.Item label="Stato pianta" value="" />
-            <Picker.Item label="Sana" value={PlantState.Healthy.toLowerCase()} />
-            <Picker.Item label="Da controllare" value={PlantState.ToCheck.toLowerCase()} />
-            <Picker.Item label="Malata" value={PlantState.Sick.toLowerCase()} />
-        </Picker>
-    </View>
+            <View style={styles.filterRow}>
+                <View style={styles.dropdownWrapperStatus}>
+                    <Picker
+                        selectedValue={statusFilter}
+                        onValueChange={(itemValue) => setStatusFilter(itemValue)}
+                        style={styles.dropdown}
+                        dropdownIconColor="gray"
+                    >
+                        <Picker.Item label="Stato pianta" value="" />
+                        <Picker.Item label="Sana" value={PlantState.Healthy.toLowerCase()} />
+                        <Picker.Item label="Da controllare" value={PlantState.ToCheck.toLowerCase()} />
+                        <Picker.Item label="Malata" value={PlantState.Sick.toLowerCase()} />
+                    </Picker>
+                </View>
 
-    <View style={styles.dropdownWrapperCategory}>
-        <Picker
-            selectedValue={categoryFilter}
-            onValueChange={(itemValue) => setCategoryFilter(itemValue)}
-            style={styles.dropdown}
-            dropdownIconColor="gray"
-        >
-            <Picker.Item label="Categorie" value="" />
-            {categories.map((cat) => (
-                <Picker.Item key={cat} label={cat} value={cat} />
-            ))}
-        </Picker>
-    </View>
-</View>
+                <View style={styles.dropdownWrapperCategory}>
+                    <Picker
+                        selectedValue={categoryFilter}
+                        onValueChange={(itemValue) => setCategoryFilter(itemValue)}
+                        style={styles.dropdown}
+                        dropdownIconColor="gray"
+                    >
+                        <Picker.Item label="Categorie" value="" />
+                        {categories.map((cat) => (
+                            <Picker.Item key={cat} label={cat} value={cat} />
+                        ))}
+                    </Picker>
+                </View>
+            </View>
 
             {(searchQuery.length > 0 || statusFilter || categoryFilter) && (
                 <FlatList
