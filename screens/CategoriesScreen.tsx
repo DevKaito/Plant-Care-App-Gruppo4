@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     View,
     Text,
@@ -7,9 +7,11 @@ import {
     FlatList,
     TouchableOpacity,
     StyleSheet,
-     Alert,
+    Alert,
 } from "react-native";
 import CheckBox from "expo-checkbox"
+import { deleteCategories, getCategories, getConnection, insertCategory } from "../db";
+import { Category } from "../models/Category";
 
 
 const CategoriesScreen = () => {
@@ -18,9 +20,23 @@ const CategoriesScreen = () => {
     const [removalMode, setRemovalMode] = useState(false);
     const [selectedForRemoval, setSelectedForRemoval] = useState<{ [key: string]: boolean }>({});
 
+    useEffect(() => {
+        const loadCategories = async () => {
+            try{
+                const db = await getConnection();
+                const categories = await getCategories(db);
+                setCategories(categories);
+            }
+            catch(error){
+                console.error("Errore nel caricamento delle categorie", error);
+            }
+        }
+
+        loadCategories();
+    }, []);
 
     //aggiunta di una categoria
-    const handleAddCategory = () => {
+    const handleAddCategory = async () => {
         if (newCategory.trim() === "") {
             Alert.alert("Errore", "Il nome della categoria non può essere vuoto.");
             return;
@@ -29,6 +45,8 @@ const CategoriesScreen = () => {
             Alert.alert("Errore", "Questa categoria esiste già.");
             return;
         }
+        const db = await getConnection();
+        await insertCategory(db, newCategory);
         setCategories([...categories, newCategory.trim()]);
         setNewCategory("");
     };
@@ -45,8 +63,12 @@ const CategoriesScreen = () => {
         }));
     };
 
-    const confirmRemoval = () => {
+    const confirmRemoval = async () => {
         const filtered = categories.filter(cat => !selectedForRemoval[cat]);
+        const removed = categories.filter(cat => selectedForRemoval[cat]);
+        const db = await getConnection();
+        await deleteCategories(db, removed);
+
         setCategories(filtered);
         setRemovalMode(false);
         setSelectedForRemoval({});

@@ -20,7 +20,6 @@ const MyPlantsTab = () => {
     const [plants, setPlants] = useState<Plant[]>([]);
     const [groupByCategory, setGroupByCategory] = useState(false);
 
-    // ✅ Carica dal DB ogni volta che la schermata è visibile
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             const loadPlants = async () => {

@@ -9,59 +9,42 @@ import {
     SafeAreaView,
 } from 'react-native';
 import { Plant } from '../models/Plant';
-import { getConnection, getPlants, getRecentPlants } from '../db';
+import { getConnection, getCurablePlants, getPlants, getRecentPlants, updatePlant } from '../db';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { HomeStackParamList } from '../models/HomeStackNavigator';
 
-<<<<<<< HEAD
-=======
-// type Plant = {
-//     id: string;
-//     name: string;
-//     image: string;
-// };
-
-// const dummyPlants: Plant[] = [
-//     { id: 'p1', name: 'Mimosa sensitiva', image: 'https://cdn-icons-png.flaticon.com/128/3800/3800257.png' },
-//     { id: 'p2', name: 'Nome p2', image: 'https://cdn-icons-png.flaticon.com/128/3800/3800257.png' },
-//     { id: 'p3', name: 'Nome p3', image: 'https://cdn-icons-png.flaticon.com/128/3800/3800257.png' },
-//     { id: 'p4', name: 'Nome p3', image: 'https://cdn-icons-png.flaticon.com/128/3800/3800257.png' },
-//     { id: 'p5', name: 'Nome p3', image: 'https://cdn-icons-png.flaticon.com/128/3800/3800257.png' },
-// ];
-
-/*const getMotivation = (item: Plant): string => {
-    const needs: string[] = [];
-
-    if (item.waterFrequency === 0) needs.push('va innaffiata');
-    if (item.pruneFrequency === 0) needs.push('va potata');
-    if (item.repotFrequency === 0) needs.push('va rinvasata');
-    return needs.join(', ');
-};*/
-
->>>>>>> 126a36678d6f9db7d2ea86e26afc382271a9985f
 const HomeTab = () => {
     const navigation = useNavigation<NativeStackNavigationProp<HomeStackParamList>>();
     const [plants, setPlants] = useState<Plant[]>([]);
     const [curablePlants, setCurablePlants] = useState<Plant[]>([]);
-
+    
     useEffect(() => {
         const focus = navigation.addListener('focus', () => {
-            const loadPlants = async () => {
+            const loadRecentPlants = async () => {
             try{
                 const db = await getConnection();
 
                 const recentPlants = await getRecentPlants(db);
                 setPlants(recentPlants);
-
-                const curablePlantList = await getPlants(db);
-                setCurablePlants(curablePlantList);
             }
             catch (error) {
                 console.error('Errore nel caricamento delle piante recenti:', error);
             }
-        };
-            loadPlants();
+            };
+            loadRecentPlants();
+
+            const loadCurablePlants = async () => {
+                try{
+                    const db = await getConnection();
+                    const curablePlants = await getCurablePlants(db);
+                    setCurablePlants(curablePlants);
+                }
+                catch (error) {
+                    console.error('Errore nel caricamento delle piante curabili:', error);
+                }
+            };
+            loadCurablePlants();
         });
         return focus;
     }, []);
@@ -101,19 +84,32 @@ const HomeTab = () => {
                     data={curablePlants}
                     keyExtractor={(item) => item.key.toString()}
                     renderItem={({ item }) => (
-                        <View style={styles.itemContainer}>
+                        
+                        <TouchableOpacity onPress={() => navigation.navigate('PlantDetailScreen', item)} style={styles.itemContainer}>
                             <Image source={{ uri: item.image }} style={styles.image} />
                 
-                        <View style={styles.textContainer}>
-                            <Text style={styles.name}>{item.name}</Text>
-                            <Text style={styles.species}>{item.species}</Text>
-                            <Text style={styles.illness}>Motivation: {item.name}</Text>   {/* item.name è provvisorio, ci va la motivazione della cura (va potata, innaffiata ecc o direttamente è malata/da controllare) */}
-                        </View>
+                            <View style={styles.textContainer}>
+                                <Text style={styles.name}>{item.name}</Text>
+                                <Text style={styles.species}>{item.species}</Text>
+                                <Text style={styles.illness}>Motivation: {item.name}</Text>
+                            </View>
 
-                        <TouchableOpacity style={styles.button}>
-                            <Text style={styles.buttonText}>Cure</Text>
+                            <TouchableOpacity
+                                onPress={async () => {
+                                    try {
+                                        const db = await getConnection();
+                                        await updatePlant(db, item, true);
+                                        console.log('Pianta curata:', item);
+                                        navigation.replace('HomeTab');
+                                    } catch (error) {
+                                        console.error('Errore durante la cura della pianta:', error);
+                                    }
+                                }}
+                                style={styles.button}
+                            >
+                                <Text style={styles.buttonText}>Cure</Text>
+                            </TouchableOpacity>
                         </TouchableOpacity>
-                    </View>
                     )}
                 />
             </View>

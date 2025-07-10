@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 
 import TabNavigator from './models/TabNavigator';
-import { createTable, getConnection } from './db';
+import { createCategoriesTable, createPlantsTable, deletePlantsTable, getConnection, getPlants, updateCountdownsAndStatus } from './db';
 import { ActivityIndicator, View } from 'react-native';
 
 export default function App() {
@@ -12,7 +12,9 @@ export default function App() {
     const initDatabase = async () => {
       try{
         const db = await getConnection();
-        await createTable(db);
+        await createPlantsTable(db);
+        await createCategoriesTable(db);
+        await updateCountdownsAndStatus(db);      
         setDbReady(true);
         console.log('Database initialized successfully');
       }catch (error) {

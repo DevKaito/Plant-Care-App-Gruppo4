@@ -11,7 +11,7 @@ import {
     ScrollView,
     Alert,
 } from 'react-native';
-import { insertPlant, updatePlant, getConnection } from '../db';
+import { insertPlant, updatePlant, getConnection, getCategories } from '../db';
 import { Plant, PlantState } from '../models/Plant';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
@@ -29,13 +29,23 @@ const AddPlantScreen = () => {
     const [pruning, setPruning] = useState('');
     const [repotting, setRepotting] = useState('');
     const [watering, setWatering] = useState('');
-    const [status, setStatus] = useState('sana');
+    const [status, setStatus] = useState<PlantState>(PlantState.Healthy);
     const [notes, setNotes] = useState('');
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [date, setDate] = useState(new Date());
-    const [imageUri, setImageUri] = useState<string | null>(null);
+    const [imageUri, setImageUri] = useState<string>('');
+    const [category, setCategory] = useState<string>('');
+
+    const[categories, setCategories] = useState<string[]>([]);
 
     useEffect(() => {
+        const loadCategories = async() => {
+            const db = await getConnection();
+            const categories = await getCategories(db);
+            setCategories(categories);
+        }
+        loadCategories();
+
         if (plantToEdit) {
             setName(plantToEdit.name || '');
             setSpecies(plantToEdit.species || '');
@@ -43,9 +53,10 @@ const AddPlantScreen = () => {
             setPruning(String(plantToEdit.pruneFrequency || ''));
             setRepotting(String(plantToEdit.repotFrequency || ''));
             setWatering(String(plantToEdit.waterFrequency || ''));
-            setStatus(plantToEdit.state || 'sana');
+            setStatus(plantToEdit.state);
             setNotes(plantToEdit.notes || '');
             setImageUri(plantToEdit.image || null);
+            setCategory(plantToEdit.category);
         }
     }, []);
 
@@ -56,9 +67,9 @@ const AddPlantScreen = () => {
         setPruning('');
         setRepotting('');
         setWatering('');
-        setStatus('sana');
+        setStatus(PlantState.Healthy);
         setNotes('');
-        setImageUri(null);
+        setImageUri('');
     };
 
     const handleSave = async () => {
@@ -79,13 +90,14 @@ const AddPlantScreen = () => {
                 waterFrequency: watering ? parseInt(watering) : 0,
                 repotFrequency: repotting ? parseInt(repotting) : 0,
                 pruneFrequency: pruning ? parseInt(pruning) : 0,
-                state: status as PlantState,
-                image: imageUri ?? '',
+                state: status,
+                image: imageUri ? imageUri : 'https://img.icons8.com/ios-filled/50/potted-plant.png',
                 notes: notes,
+                category: category ? category : ''
             };
 
             if (plantToEdit) {
-                await updatePlant(db, newPlant);
+                await updatePlant(db, newPlant, false);
             } else {
                 await insertPlant(db, newPlant);
             }
@@ -224,13 +236,23 @@ const AddPlantScreen = () => {
                 <Text>Stato della pianta*:</Text>
                 <View style={styles.pickerContainer}>
                     <Picker selectedValue={status} onValueChange={(itemValue) => setStatus(itemValue)}>
-                        <Picker.Item label="Sana" value="sana" />
-                        <Picker.Item label="Da controllare" value="controllare" />
-                        <Picker.Item label="Malata" value="malata" />
+                        <Picker.Item label="Sana" value={PlantState.Healthy} />
+                        <Picker.Item label="Da controllare" value={PlantState.ToCheck} />
+                        <Picker.Item label="Malata" value={PlantState.Sick} />
                     </Picker>
                 </View>
             </View>
-
+            <View style={styles.inputGroup}>
+                <Text>Categoria:</Text>
+                <View style={styles.pickerContainer}>
+                    <Picker selectedValue={category} onValueChange={(value) => setCategory(value)}>
+                        <Picker.Item label="Nessuna categoria" value={''}/>
+                        {categories.map((cat) => (
+                            <Picker.Item label={cat} value={cat} key={cat} />
+                        ))}
+                    </Picker>
+                </View>
+            </View>
             <View style={styles.inputGroup}>
                 <Text>Note personali:</Text>
                 <TextInput

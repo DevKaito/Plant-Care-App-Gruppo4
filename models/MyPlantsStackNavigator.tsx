@@ -9,7 +9,7 @@ import { Plant } from '../models/Plant';
 
 export type MyPlantsStackParamList = {
   MyPlantsTab: undefined;
-  AddPlantScreen: undefined;
+  AddPlantScreen: Plant | undefined;
   PlantDetailScreen: Plant;
   CategoriesScreen: undefined;
 };

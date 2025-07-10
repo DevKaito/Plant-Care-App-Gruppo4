@@ -55,6 +55,7 @@ export default function PlantDetailScreen({ route }: { route: any }) {
             <Text style={styles.label}>🌿 Potatura: <Text style={styles.value}>{plant.pruneFrequency} giorni</Text></Text>
             <Text style={styles.label}>🪴 Rinvaso: <Text style={styles.value}>{plant.repotFrequency} giorni</Text></Text>
             <Text style={styles.label}>❤️ Stato: <Text style={styles.value}>{plant.state}</Text></Text>
+            <Text style={styles.label}>🗂️ Categorie: <Text style={styles.value}>{plant.category || '-'}</Text></Text>
             <Text style={styles.label}>📝 Note: <Text style={styles.value}>{plant.notes || '-'}</Text></Text>
 
             <View style={styles.buttonContainer}>
