@@ -4,23 +4,34 @@ import {
     Text,
     TextInput,
     FlatList,
-    Keyboard,
     StyleSheet,
     TouchableOpacity,
     Image,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
 import { useNavigation } from '@react-navigation/native';
+import DropDownPicker from 'react-native-dropdown-picker';
 import { getConnection, getPlants } from '../db';
 import { Plant, PlantState } from '../models/Plant';
 
 export default function SearchScreen() {
     const navigation = useNavigation<any>();
+
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState<Plant[]>([]);
-    const [statusFilter, setStatusFilter] = useState("");
-    const [categoryFilter, setCategoryFilter] = useState("");
+
+    const [openStatus, setOpenStatus] = useState(false);
+    const [statusFilter, setStatusFilter] = useState<string | null>(null);
+
+    const [openCategory, setOpenCategory] = useState(false);
+    const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+
     const [categories, setCategories] = useState<string[]>([]);
+
+    const statusItems = [
+        { label: "Sana", value: PlantState.Healthy.toLowerCase() },
+        { label: "Da controllare", value: PlantState.ToCheck.toLowerCase() },
+        { label: "Malata", value: PlantState.Sick.toLowerCase() },
+    ];
 
     useEffect(() => {
         (async () => {
@@ -38,27 +49,27 @@ export default function SearchScreen() {
     const handleSearch = async () => {
         const query = searchQuery.trim().toLowerCase();
 
-        try {
-            const db = await getConnection();
-            let allPlants = await getPlants(db);
+    try {
+        const db = await getConnection();
+        let allPlants = await getPlants(db);
 
-            let filtered = allPlants.filter((plant) => {
-                const matchesQuery =
-                    plant.name.toLowerCase().includes(query) ||
-                    plant.species.toLowerCase().includes(query);
+        let filtered = allPlants.filter((plant) => {
+            const matchesQuery =
+            plant.name.toLowerCase().includes(query) ||
+            plant.species.toLowerCase().includes(query);
 
-                const matchesStatus =
-                    statusFilter === "" || plant.state?.toLowerCase() === statusFilter.toLowerCase();
+        const matchesStatus =
+            !statusFilter || plant.state?.toLowerCase() === statusFilter.toLowerCase();
 
-                const matchesCategory =
-                    categoryFilter === "" || plant.category === categoryFilter;
+        const matchesCategory =
+            !categoryFilter || plant.category === categoryFilter;
 
-                return matchesQuery && matchesStatus && matchesCategory;
-            });
+        return matchesQuery && matchesStatus && matchesCategory;
+        });
 
-            setSearchResults(filtered);
+        setSearchResults(filtered);
         } catch (error) {
-            console.error("Search error:", error);
+        console.error("Search error:", error);
         }
     };
 
@@ -67,66 +78,70 @@ export default function SearchScreen() {
             <TextInput
                 placeholder="🔍 Search"
                 value={searchQuery}
-                onChangeText={(text) => setSearchQuery(text)}
+                onChangeText={setSearchQuery}
                 style={styles.input}
             />
 
-          <View style={styles.filterRow}>
-    <View style={styles.dropdownWrapperStatus}>
-        <Picker
-            selectedValue={statusFilter}
-            onValueChange={(itemValue) => setStatusFilter(itemValue)}
-            style={styles.dropdown}
-            dropdownIconColor="gray"
-        >
-            <Picker.Item label="Stato pianta" value="" />
-            <Picker.Item label="Sana" value={PlantState.Healthy.toLowerCase()} />
-            <Picker.Item label="Da controllare" value={PlantState.ToCheck.toLowerCase()} />
-            <Picker.Item label="Malata" value={PlantState.Sick.toLowerCase()} />
-        </Picker>
-    </View>
-
-    <View style={styles.dropdownWrapperCategory}>
-        <Picker
-            selectedValue={categoryFilter}
-            onValueChange={(itemValue) => setCategoryFilter(itemValue)}
-            style={styles.dropdown}
-            dropdownIconColor="gray"
-        >
-            <Picker.Item label="Categorie" value="" />
-            {categories.map((cat) => (
-                <Picker.Item key={cat} label={cat} value={cat} />
-            ))}
-        </Picker>
-    </View>
-</View>
-
-            {(searchQuery.length > 0 || statusFilter || categoryFilter) && (
-                <FlatList
-                    data={searchResults}
-                    keyExtractor={(item) => item.key.toString()}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity
-                            style={styles.plantCard}
-                            onPress={() => navigation.navigate('PlantDetailScreen', item)}
-                        >
-                            <Image
-                                source={{ uri: item.image || 'https://via.placeholder.com/50' }}
-                                style={styles.plantImage}
-                            />
-                            <View style={styles.plantInfo}>
-                                <Text style={styles.plantName}>{item.name}</Text>
-                                <Text style={styles.plantSpecies}>{item.species}</Text>
-                            </View>
-                        </TouchableOpacity>
-                    )}
-                    ListEmptyComponent={() => (
-                        <Text style={styles.noResultsText}>Nessun risultato trovato!</Text>
-                    )}
+        <View style={styles.filterRow}>
+            <View style={styles.dropdownWrapperStatus}>
+                <DropDownPicker
+                    open={openStatus}
+                    value={statusFilter}
+                    items={statusItems}
+                    setOpen={setOpenStatus}
+                    setValue={setStatusFilter}
+                    placeholder="Stato pianta"
+                    dropDownDirection="BOTTOM"
+                    style={styles.dropdown}
+                    dropDownContainerStyle={{ backgroundColor: '#fff' }}
+                    zIndex={3000}
+                    zIndexInverse={1000}
                 />
-            )}
+            </View>
+
+            <View style={styles.dropdownWrapperCategory}>
+                <DropDownPicker
+                    open={openCategory}
+                    value={categoryFilter}
+                    items={categories.map(cat => ({ label: cat, value: cat }))}
+                    setOpen={setOpenCategory}
+                    setValue={setCategoryFilter}
+                    placeholder="Categorie"
+                    dropDownDirection="BOTTOM"
+                    style={styles.dropdown}
+                    dropDownContainerStyle={{ backgroundColor: '#fff' }}
+                    zIndex={2000}
+                    zIndexInverse={2000}
+               />
+            </View>
         </View>
-    );
+
+        {(searchQuery.length > 0 || statusFilter || categoryFilter) && (
+            <FlatList
+                data={searchResults}
+                keyExtractor={(item) => item.key.toString()}
+                renderItem={({ item }) => (
+                    <TouchableOpacity
+                        style={styles.plantCard}
+                        onPress={() => navigation.navigate('PlantDetailScreen', item)}
+                    >
+                        <Image
+                            source={{ uri: item.image || 'https://via.placeholder.com/50' }}
+                            style={styles.plantImage}
+                        />
+                        <View style={styles.plantInfo}>
+                            <Text style={styles.plantName}>{item.name}</Text>
+                            <Text style={styles.plantSpecies}>{item.species}</Text>
+                        </View>
+                    </TouchableOpacity>
+                )}
+                ListEmptyComponent={() => (
+                    <Text style={styles.noResultsText}>Nessun risultato trovato!</Text>
+                )}
+            />
+        )}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -146,34 +161,22 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginBottom: 12,
+        zIndex: 1000,
     },
     dropdownWrapperStatus: {
-    borderWidth: 1,
-    borderColor: 'gray',
-    borderRadius: 6,
-    marginHorizontal: 2,
-    backgroundColor: '#fff',
-    paddingHorizontal: 4,
-    paddingVertical: 2,
-    width: 150,  
-},
-dropdownWrapperCategory: {
-    borderWidth: 1,
-    borderColor: 'gray',
-    borderRadius: 6,
-    marginHorizontal: 2,
-    backgroundColor: '#fff',
-    paddingHorizontal: 4,
-    paddingVertical: 2,
-    flex: 1, 
-       
+        width: 150,
+        marginHorizontal: 4,
+        zIndex: 3000,
+    },
+    dropdownWrapperCategory: {
+        flex: 1,
+        marginHorizontal: 4,
+        zIndex: 2000,
     },
     dropdown: {
-        height: 50,
-        width: '100%',
-        color: '#000',
-        fontSize:10,
         backgroundColor: '#fff',
+        borderColor: 'gray',
+        borderWidth: 1,
     },
     noResultsText: {
         padding: 10,
@@ -205,6 +208,4 @@ dropdownWrapperCategory: {
         fontSize: 14,
         color: '#666',
     },
-}); 
-
-
+});
