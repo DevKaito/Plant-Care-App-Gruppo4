@@ -11,8 +11,6 @@ import {
 } from "react-native";
 import CheckBox from "expo-checkbox"
 import { deleteCategories, getCategories, getConnection, insertCategory } from "../db";
-import { Category } from "../models/Category";
-
 
 const CategoriesScreen = () => {
     const [categories, setCategories] = useState<string[]>([]);
