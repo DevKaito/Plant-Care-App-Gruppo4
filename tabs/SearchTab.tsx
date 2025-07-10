@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     View,
     Text,
@@ -9,15 +9,31 @@ import {
     TouchableOpacity,
     Image,
 } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import { useNavigation } from '@react-navigation/native';
 import { getConnection, getPlants } from '../db';
-import { Plant } from '../models/Plant';
-
+import { Plant, PlantState } from '../models/Plant';
 
 export default function SearchScreen() {
     const navigation = useNavigation<any>();
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState<Plant[]>([]);
+    const [statusFilter, setStatusFilter] = useState("");
+    const [categoryFilter, setCategoryFilter] = useState("");
+    const [categories, setCategories] = useState<string[]>([]);
+
+    useEffect(() => {
+        (async () => {
+            const db = await getConnection();
+            const allPlants = await getPlants(db);
+            const uniqueCategories = [...new Set(allPlants.map(p => p.category))];
+            setCategories(uniqueCategories);
+        })();
+    }, []);
+
+    useEffect(() => {
+        handleSearch();
+    }, [searchQuery, statusFilter, categoryFilter]);
 
     const handleSearch = async () => {
         const query = searchQuery.trim().toLowerCase();
@@ -26,12 +42,21 @@ export default function SearchScreen() {
             const db = await getConnection();
             let allPlants = await getPlants(db);
 
-            let filtered = allPlants.filter(
-                (plant) => plant.name.toLowerCase().includes(query) || plant.species.toLowerCase().includes(query)
-            );
+            let filtered = allPlants.filter((plant) => {
+                const matchesQuery =
+                    plant.name.toLowerCase().includes(query) ||
+                    plant.species.toLowerCase().includes(query);
+
+                const matchesStatus =
+                    statusFilter === "" || plant.state?.toLowerCase() === statusFilter.toLowerCase();
+
+                const matchesCategory =
+                    categoryFilter === "" || plant.category === categoryFilter;
+
+                return matchesQuery && matchesStatus && matchesCategory;
+            });
 
             setSearchResults(filtered);
-            Keyboard.dismiss();
         } catch (error) {
             console.error("Search error:", error);
         }
@@ -40,19 +65,43 @@ export default function SearchScreen() {
     return (
         <View style={styles.container}>
             <TextInput
-                placeholder="Search..."
+                placeholder="🔍 Search"
                 value={searchQuery}
-                onChangeText={(text) => {
-                    setSearchQuery(text);
-                    if (text.trim() === '') {
-                        setSearchResults([]);
-                    }
-                }}
-                onSubmitEditing={handleSearch}
+                onChangeText={(text) => setSearchQuery(text)}
                 style={styles.input}
             />
 
-            {searchQuery.length > 0 && (
+          <View style={styles.filterRow}>
+    <View style={styles.dropdownWrapperStatus}>
+        <Picker
+            selectedValue={statusFilter}
+            onValueChange={(itemValue) => setStatusFilter(itemValue)}
+            style={styles.dropdown}
+            dropdownIconColor="gray"
+        >
+            <Picker.Item label="Stato pianta" value="" />
+            <Picker.Item label="Sana" value={PlantState.Healthy.toLowerCase()} />
+            <Picker.Item label="Da controllare" value={PlantState.ToCheck.toLowerCase()} />
+            <Picker.Item label="Malata" value={PlantState.Sick.toLowerCase()} />
+        </Picker>
+    </View>
+
+    <View style={styles.dropdownWrapperCategory}>
+        <Picker
+            selectedValue={categoryFilter}
+            onValueChange={(itemValue) => setCategoryFilter(itemValue)}
+            style={styles.dropdown}
+            dropdownIconColor="gray"
+        >
+            <Picker.Item label="Categorie" value="" />
+            {categories.map((cat) => (
+                <Picker.Item key={cat} label={cat} value={cat} />
+            ))}
+        </Picker>
+    </View>
+</View>
+
+            {(searchQuery.length > 0 || statusFilter || categoryFilter) && (
                 <FlatList
                     data={searchResults}
                     keyExtractor={(item) => item.key.toString()}
@@ -62,7 +111,7 @@ export default function SearchScreen() {
                             onPress={() => navigation.navigate('PlantDetailScreen', item)}
                         >
                             <Image
-                                source={{ uri: item.image || 'Immagine Fittizia' }}              //da inserire immagine fittizia
+                                source={{ uri: item.image || 'https://via.placeholder.com/50' }}
                                 style={styles.plantImage}
                             />
                             <View style={styles.plantInfo}>
@@ -72,7 +121,7 @@ export default function SearchScreen() {
                         </TouchableOpacity>
                     )}
                     ListEmptyComponent={() => (
-                        <Text style={styles.noResultsText}>No results found!</Text>
+                        <Text style={styles.noResultsText}>Nessun risultato trovato!</Text>
                     )}
                 />
             )}
@@ -84,14 +133,47 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: 'white',
         flex: 1,
-        padding: 16
+        padding: 16,
     },
     input: {
         borderColor: 'grey',
         borderWidth: 1,
         borderRadius: 6,
-        padding: 8,
+        padding: 10,
         marginBottom: 12,
+    },
+    filterRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 12,
+    },
+    dropdownWrapperStatus: {
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 6,
+    marginHorizontal: 2,
+    backgroundColor: '#fff',
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    width: 150,  
+},
+dropdownWrapperCategory: {
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 6,
+    marginHorizontal: 2,
+    backgroundColor: '#fff',
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    flex: 1, 
+       
+    },
+    dropdown: {
+        height: 50,
+        width: '100%',
+        color: '#000',
+        fontSize:10,
+        backgroundColor: '#fff',
     },
     noResultsText: {
         padding: 10,
@@ -123,4 +205,6 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#666',
     },
-});
+}); 
+
+
