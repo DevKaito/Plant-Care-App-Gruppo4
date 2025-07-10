@@ -21,7 +21,7 @@ const MyPlantsTab = () => {
     const [groupByCategory, setGroupByCategory] = useState(false);
 
     useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', () => {
+        const focus = navigation.addListener('focus', () => {
             const loadPlants = async () => {
                 try {
                     const db = await getConnection();
@@ -35,7 +35,7 @@ const MyPlantsTab = () => {
             loadPlants();
         });
 
-        return unsubscribe;
+        return focus;
     }, [navigation]);
 
     const groupPlantsByCategory = (plants: Plant[]) => {

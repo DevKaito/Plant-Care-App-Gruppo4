@@ -99,7 +99,7 @@ const HomeTab = () => {
                                     try {
                                         const db = await getConnection();
                                         await updatePlant(db, item, true);
-                                        console.log('Pianta curata:', item);
+                                        console.log('Pianta curata:', item.name);
                                         navigation.replace('HomeTab');
                                     } catch (error) {
                                         console.error('Errore durante la cura della pianta:', error);

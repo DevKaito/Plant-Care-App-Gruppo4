@@ -6,7 +6,7 @@ let db: SQLite.SQLiteDatabase | null = null;
 export const getConnection = async(): Promise<SQLite.SQLiteDatabase> =>{
     try{
         if(!db) {
-            db = await SQLite.openDatabaseAsync('db.db');
+            db = SQLite.openDatabaseSync('db.db');
         }
         return db;
     } catch (error) {
@@ -57,25 +57,15 @@ export const insertCategory = async (db: SQLite.SQLiteDatabase, name: string) =>
 }
 
 export const updatePlant = async (db: SQLite.SQLiteDatabase, plant: Plant, cure: boolean) => {
-    const updateQuery = `
-    UPDATE plants SET
-        name = ?,
-        species = ?,
-        acquireDate = ?,
-        waterFreq = ?,
-        repotFreq = ?,
-        pruneFreq = ?,
-        status = ?,
-        image = ?,
-        notes = ?,
-        waterCountdown = ?,
-        repotCountdown = ?,
-        pruneCountdown = ?,
-        category = ?
-    WHERE id = ?
-  `;
+    let updateQuery = '';
     let params = [];
+    
     if(!cure){
+        updateQuery = `
+            UPDATE plants 
+            SET name = ?, species = ?, acquireDate = ?, waterFreq = ?, repotFreq = ?, pruneFreq = ?, status = ?, image = ?, notes = ?, waterCountdown = ?, repotCountdown = ?, pruneCountdown = ?, category = ?
+            WHERE id = ? 
+        `;
         params = [
             plant.name,
             plant.species,
@@ -93,25 +83,34 @@ export const updatePlant = async (db: SQLite.SQLiteDatabase, plant: Plant, cure:
             plant.key
         ];
     }
+
     else{
-        params = [
-            plant.name,
-            plant.species,
-            plant.ownedSince.toISOString(),
-            plant.waterFrequency,
-            plant.repotFrequency,
-            plant.pruneFrequency,
-            PlantState.Healthy,
-            plant.image,
-            plant.notes,
-            plant.waterFrequency,
-            plant.repotFrequency,
-            plant.pruneFrequency,
-            plant.category,
-            plant.key
-        ];
+        const selectQuery = `
+            SELECT waterCountdown, repotCountdown, pruneCountdown
+            FROM plants
+            WHERE id = ?
+        `
+        const results = await db.getAllAsync<{ waterCountdown: number; repotCountdown: number; pruneCountdown: number }>(selectQuery, plant.key);
+        const row = results[0];
+
+        const updates: string[] = [];
+
+        if (row && row.waterCountdown === 0) {
+            updates.push("waterCountdown = ?");
+            params.push(plant.waterFrequency)
+        }
+        if (row && row.repotCountdown === 0) {
+            updates.push("repotCountdown = ?");
+            params.push(plant.repotFrequency)
+        }
+        if (row && row.pruneCountdown === 0) {
+            updates.push("pruneCountdown = ?");
+            params.push(plant.pruneFrequency)
+        }
+        params.push(PlantState.Healthy, plant.key);
+        
+        updateQuery = `UPDATE plants SET ${updates.join(", ")}, status = ? WHERE id = ?`
     }
-    
     await db.runAsync(updateQuery, params);
 };
 
@@ -174,7 +173,6 @@ export const getPlants = async (db:SQLite.SQLiteDatabase): Promise<Plant[]> => {
                 category: row.category
             };
             plants.push(plant);
-            console.log(plant, row.waterCountdown, row.repotCountdown, row.pruneCountdown);
         })
         return plants;
     }

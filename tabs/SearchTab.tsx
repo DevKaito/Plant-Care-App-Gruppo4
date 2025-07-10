@@ -12,9 +12,11 @@ import { useNavigation } from '@react-navigation/native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { getConnection, getPlants } from '../db';
 import { Plant, PlantState } from '../models/Plant';
+import { SearchStackParamList } from "../models/SearchStackNavigator";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 export default function SearchScreen() {
-    const navigation = useNavigation<any>();
+    const navigation = useNavigation<NativeStackNavigationProp<SearchStackParamList>>();
 
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState<Plant[]>([]);
@@ -34,12 +36,25 @@ export default function SearchScreen() {
     ];
 
     useEffect(() => {
-        (async () => {
-            const db = await getConnection();
-            const allPlants = await getPlants(db);
-            const uniqueCategories = [...new Set(allPlants.map(p => p.category).filter(cat => cat && cat.trim() !== ''))];
-            setCategories(uniqueCategories);
-        })();
+        const focus = navigation.addListener('focus', () => {
+            setOpenStatus(false);
+            setOpenCategory(false);
+            setStatusFilter(null);
+            setCategoryFilter(null);   
+             
+            const loadPlants = async () => {
+                try {
+                    const db = await getConnection();
+                    const allPlants = await getPlants(db);
+                    const uniqueCategories = [...new Set(allPlants.map(p => p.category).filter(cat => cat && cat.trim() !== ''))];
+                    setCategories(uniqueCategories);
+                } catch(error) {
+                    console.error('Errore ricerca', error)
+                }
+            };
+            loadPlants();
+            })
+            return focus;
     }, []);
 
     useEffect(() => {
@@ -82,60 +97,6 @@ export default function SearchScreen() {
                 style={styles.input}
             />
 
-<<<<<<< HEAD
-            <View style={styles.filterRow}>
-                <View style={styles.dropdownWrapperStatus}>
-                    <Picker
-                        selectedValue={statusFilter}
-                        onValueChange={(itemValue) => setStatusFilter(itemValue)}
-                        style={styles.dropdown}
-                        dropdownIconColor="gray"
-                    >
-                        <Picker.Item label="Stato pianta" value="" />
-                        <Picker.Item label="Sana" value={PlantState.Healthy.toLowerCase()} />
-                        <Picker.Item label="Da controllare" value={PlantState.ToCheck.toLowerCase()} />
-                        <Picker.Item label="Malata" value={PlantState.Sick.toLowerCase()} />
-                    </Picker>
-                </View>
-
-                <View style={styles.dropdownWrapperCategory}>
-                    <Picker
-                        selectedValue={categoryFilter}
-                        onValueChange={(itemValue) => setCategoryFilter(itemValue)}
-                        style={styles.dropdown}
-                        dropdownIconColor="gray"
-                    >
-                        <Picker.Item label="Categorie" value="" />
-                        {categories.map((cat) => (
-                            <Picker.Item key={cat} label={cat} value={cat} />
-                        ))}
-                    </Picker>
-                </View>
-            </View>
-
-            {(searchQuery.length > 0 || statusFilter || categoryFilter) && (
-                <FlatList
-                    data={searchResults}
-                    keyExtractor={(item) => item.key.toString()}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity
-                            style={styles.plantCard}
-                            onPress={() => navigation.navigate('PlantDetailScreen', item)}
-                        >
-                            <Image
-                                source={{ uri: item.image || 'https://via.placeholder.com/50' }}
-                                style={styles.plantImage}
-                            />
-                            <View style={styles.plantInfo}>
-                                <Text style={styles.plantName}>{item.name}</Text>
-                                <Text style={styles.plantSpecies}>{item.species}</Text>
-                            </View>
-                        </TouchableOpacity>
-                    )}
-                    ListEmptyComponent={() => (
-                        <Text style={styles.noResultsText}>Nessun risultato trovato!</Text>
-                    )}
-=======
         <View style={styles.filterRow}>
             <View style={styles.dropdownWrapperStatus}>
                 <DropDownPicker
@@ -150,7 +111,6 @@ export default function SearchScreen() {
                     dropDownContainerStyle={{ backgroundColor: '#fff' }}
                     zIndex={3000}
                     zIndexInverse={1000}
->>>>>>> 0790577d1a79a976f721b03a6a86ddf3231545ad
                 />
             </View>
 
