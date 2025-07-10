@@ -1,4 +1,3 @@
-import { Category } from './models/Category';
 import { Plant, PlantState } from './models/Plant';
 import * as SQLite from 'expo-sqlite';
 
@@ -7,7 +6,7 @@ let db: SQLite.SQLiteDatabase | null = null;
 export const getConnection = async(): Promise<SQLite.SQLiteDatabase> =>{
     try{
         if(!db) {
-            db = SQLite.openDatabaseSync('db.db');
+            db = await SQLite.openDatabaseAsync('db.db');
         }
         return db;
     } catch (error) {
