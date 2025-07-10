@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { Plant, PlantState } from '../models/Plant';
 import { useNavigation } from '@react-navigation/native';
-import { createTable, deleteAllPlants, deleteTable, getConnection, getPlants, insertPlant } from '../db';
+import { deleteAllPlants, getConnection, getPlants, insertPlant } from '../db';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MyPlantsStackParamList } from '../models/MyPlantsStackNavigator';
 
