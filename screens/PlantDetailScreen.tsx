@@ -7,7 +7,6 @@ import {
     TouchableOpacity,
     Alert,
 } from 'react-native';
-import { Plant } from '../models/Plant';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { getConnection, deletePlant, getPlants } from '../db';
 

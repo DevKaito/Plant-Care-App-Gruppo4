@@ -41,7 +41,7 @@ export default function SearchScreen() {
             setOpenCategory(false);
             setStatusFilter(null);
             setCategoryFilter(null);   
-             
+            setSearchQuery(""); 
             const loadPlants = async () => {
                 try {
                     const db = await getConnection();
