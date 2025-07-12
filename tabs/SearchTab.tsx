@@ -40,21 +40,31 @@ export default function SearchScreen() {
             setOpenStatus(false);
             setOpenCategory(false);
             setStatusFilter(null);
-            setCategoryFilter(null);   
-            setSearchQuery(""); 
+            setCategoryFilter(null);
+            setSearchQuery("");
+
             const loadPlants = async () => {
                 try {
                     const db = await getConnection();
                     const allPlants = await getPlants(db);
-                    const uniqueCategories = [...new Set(allPlants.map(p => p.category).filter(cat => cat && cat.trim() !== ''))];
+
+                    // ✅ Rimozione di null in modo tipizzato
+                    const uniqueCategories = [...new Set(
+                        allPlants
+                            .map(p => p.category)
+                            .filter((cat): cat is string => cat !== null && cat.trim() !== '')
+                    )];
+
                     setCategories(uniqueCategories);
-                } catch(error) {
-                    console.error('Search error', error)
+                } catch (error) {
+                    console.error('Search error', error);
                 }
             };
+
             loadPlants();
-            })
-            return focus;
+        });
+
+        return focus;
     }, []);
 
     useEffect(() => {
@@ -64,27 +74,27 @@ export default function SearchScreen() {
     const handleSearch = async () => {
         const query = searchQuery.trim().toLowerCase();
 
-    try {
-        const db = await getConnection();
-        let allPlants = await getPlants(db);
+        try {
+            const db = await getConnection();
+            let allPlants = await getPlants(db);
 
-        let filtered = allPlants.filter((plant) => {
-            const matchesQuery =
-            plant.name.toLowerCase().includes(query) ||
-            plant.species.toLowerCase().includes(query);
+            let filtered = allPlants.filter((plant) => {
+                const matchesQuery =
+                    plant.name.toLowerCase().includes(query) ||
+                    plant.species.toLowerCase().includes(query);
 
-        const matchesStatus =
-            !statusFilter || plant.state?.toLowerCase() === statusFilter.toLowerCase();
+                const matchesStatus =
+                    !statusFilter || plant.state?.toLowerCase() === statusFilter.toLowerCase();
 
-        const matchesCategory =
-            !categoryFilter || plant.category === categoryFilter;
+                const matchesCategory =
+                    !categoryFilter || plant.category === categoryFilter;
 
-        return matchesQuery && matchesStatus && matchesCategory;
-        });
+                return matchesQuery && matchesStatus && matchesCategory;
+            });
 
-        setSearchResults(filtered);
+            setSearchResults(filtered);
         } catch (error) {
-        console.error("Search error:", error);
+            console.error("Search error:", error);
         }
     };
 
@@ -97,66 +107,66 @@ export default function SearchScreen() {
                 style={styles.input}
             />
 
-        <View style={styles.filterRow}>
-            <View style={styles.dropdownWrapperStatus}>
-                <DropDownPicker
-                    open={openStatus}
-                    value={statusFilter}
-                    items={statusItems}
-                    setOpen={setOpenStatus}
-                    setValue={setStatusFilter}
-                    placeholder="Plant state"
-                    dropDownDirection="BOTTOM"
-                    style={styles.dropdown}
-                    dropDownContainerStyle={{ backgroundColor: '#fff' }}
-                    zIndex={3000}
-                    zIndexInverse={1000}
+            <View style={styles.filterRow}>
+                <View style={styles.dropdownWrapperStatus}>
+                    <DropDownPicker
+                        open={openStatus}
+                        value={statusFilter}
+                        items={statusItems}
+                        setOpen={setOpenStatus}
+                        setValue={setStatusFilter}
+                        placeholder="Plant state"
+                        dropDownDirection="BOTTOM"
+                        style={styles.dropdown}
+                        dropDownContainerStyle={{ backgroundColor: '#fff' }}
+                        zIndex={3000}
+                        zIndexInverse={1000}
+                    />
+                </View>
+
+                <View style={styles.dropdownWrapperCategory}>
+                    <DropDownPicker
+                        open={openCategory}
+                        value={categoryFilter}
+                        items={categories.map(cat => ({ label: cat, value: cat }))}
+                        setOpen={setOpenCategory}
+                        setValue={setCategoryFilter}
+                        placeholder="Categories"
+                        dropDownDirection="BOTTOM"
+                        style={styles.dropdown}
+                        dropDownContainerStyle={{ backgroundColor: '#fff' }}
+                        zIndex={2000}
+                        zIndexInverse={2000}
+                    />
+                </View>
+            </View>
+
+            {(searchQuery.length > 0 || statusFilter || categoryFilter) && (
+                <FlatList
+                    data={searchResults}
+                    keyExtractor={(item) => item.key.toString()}
+                    renderItem={({ item }) => (
+                        <TouchableOpacity
+                            style={styles.plantCard}
+                            onPress={() => navigation.navigate('PlantDetailScreen', item)}
+                        >
+                            <Image
+                                source={{ uri: item.image || 'https://via.placeholder.com/50' }}
+                                style={styles.plantImage}
+                            />
+                            <View style={styles.plantInfo}>
+                                <Text style={styles.plantName}>{item.name}</Text>
+                                <Text style={styles.plantSpecies}>{item.species}</Text>
+                            </View>
+                        </TouchableOpacity>
+                    )}
+                    ListEmptyComponent={() => (
+                        <Text style={styles.noResultsText}>No results found!</Text>
+                    )}
                 />
-            </View>
-
-            <View style={styles.dropdownWrapperCategory}>
-                <DropDownPicker
-                    open={openCategory}
-                    value={categoryFilter}
-                    items={categories.map(cat => ({ label: cat, value: cat }))}
-                    setOpen={setOpenCategory}
-                    setValue={setCategoryFilter}
-                    placeholder="Categories"
-                    dropDownDirection="BOTTOM"
-                    style={styles.dropdown}
-                    dropDownContainerStyle={{ backgroundColor: '#fff' }}
-                    zIndex={2000}
-                    zIndexInverse={2000}
-               />
-            </View>
+            )}
         </View>
-
-        {(searchQuery.length > 0 || statusFilter || categoryFilter) && (
-            <FlatList
-                data={searchResults}
-                keyExtractor={(item) => item.key.toString()}
-                renderItem={({ item }) => (
-                    <TouchableOpacity
-                        style={styles.plantCard}
-                        onPress={() => navigation.navigate('PlantDetailScreen', item)}
-                    >
-                        <Image
-                            source={{ uri: item.image || 'https://via.placeholder.com/50' }}
-                            style={styles.plantImage}
-                        />
-                        <View style={styles.plantInfo}>
-                            <Text style={styles.plantName}>{item.name}</Text>
-                            <Text style={styles.plantSpecies}>{item.species}</Text>
-                        </View>
-                    </TouchableOpacity>
-                )}
-                ListEmptyComponent={() => (
-                    <Text style={styles.noResultsText}>No results found!</Text>
-                )}
-            />
-        )}
-    </View>
-  );
+    );
 }
 
 const styles = StyleSheet.create({

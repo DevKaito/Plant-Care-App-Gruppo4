@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
     View,
     Text,
@@ -6,6 +6,7 @@ import {
     ScrollView,
     TouchableOpacity,
     Alert,
+    useWindowDimensions
 } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { getConnection, deletePlant, getPlants } from '../db';
@@ -14,14 +15,16 @@ export default function PlantDetailScreen({ route }: { route: any }) {
     const navigation = useNavigation<any>();
     const plant = route.params;
     const [updatedPlant, setUpdatedPlant] = useState(plant);
+    const { width, height } = useWindowDimensions();
+    const isLandscape = width > height;
 
     useFocusEffect(
-        useCallback(() =>{
+        useCallback(() => {
             const fetchUpdatedPlant = async () => {
                 const db = await getConnection();
-                const allPlants= await getPlants(db);
+                const allPlants = await getPlants(db);
                 const newPlant = allPlants.find((p) => p.key === updatedPlant.key);
-                if (newPlant){
+                if (newPlant) {
                     setUpdatedPlant(newPlant);
                 }
             };
@@ -38,10 +41,7 @@ export default function PlantDetailScreen({ route }: { route: any }) {
             'Confirm deletion',
             'Are you sure you want to remove this plant?',
             [
-                {
-                    text: 'Cancel',
-                    style: 'cancel',
-                },
+                { text: 'Cancel', style: 'cancel' },
                 {
                     text: 'Delete',
                     style: 'destructive',
@@ -60,9 +60,8 @@ export default function PlantDetailScreen({ route }: { route: any }) {
         );
     };
 
-    return (
-        <ScrollView contentContainerStyle={styles.container}>
-            <Text style={styles.title}>Plant detail</Text>
+    const details = (
+        <>
             <Text style={styles.label}>🌱 Name: <Text style={styles.value}>{updatedPlant.name}</Text></Text>
             <Text style={styles.label}>🔖 Species: <Text style={styles.value}>{updatedPlant.species}</Text></Text>
             <Text style={styles.label}>📅 Acquisition: <Text style={styles.value}>{new Date(updatedPlant.ownedSince).toISOString().split('T')[0]}</Text></Text>
@@ -72,15 +71,35 @@ export default function PlantDetailScreen({ route }: { route: any }) {
             <Text style={styles.label}>❤️ State: <Text style={styles.value}>{updatedPlant.state}</Text></Text>
             <Text style={styles.label}>🗂️ Categories: <Text style={styles.value}>{updatedPlant.category || '-'}</Text></Text>
             <Text style={styles.label}>📝 Notes: <Text style={styles.value}>{updatedPlant.notes || '-'}</Text></Text>
+        </>
+    );
 
-            <View style={styles.buttonContainer}>
-                <TouchableOpacity style={[styles.button, styles.editButton]} onPress={handleEdit}>
-                    <Text style={styles.buttonText}>Edit</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.button, styles.deleteButton]} onPress={handleDelete}>
-                    <Text style={styles.buttonText}>Delete</Text>
-                </TouchableOpacity>
-            </View>
+    const buttons = (
+        <View style={styles.buttonContainer}>
+            <TouchableOpacity style={[styles.button, styles.editButton]} onPress={handleEdit}>
+                <Text style={styles.buttonText}>Edit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.button, styles.deleteButton]} onPress={handleDelete}>
+                <Text style={styles.buttonText}>Delete</Text>
+            </TouchableOpacity>
+        </View>
+    );
+
+    return (
+        <ScrollView contentContainerStyle={styles.container}>
+            <Text style={styles.title}>Plant detail</Text>
+
+            {isLandscape ? (
+                <View style={styles.landscapeContainer}>
+                    <View style={styles.leftColumn}>{details}</View>
+                    <View style={styles.rightColumn}>{buttons}</View>
+                </View>
+            ) : (
+                <>
+                    {details}
+                    {buttons}
+                </>
+            )}
         </ScrollView>
     );
 }
@@ -122,5 +141,18 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
         fontSize: 16,
+    },
+    landscapeContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        gap: 20,
+    },
+    leftColumn: {
+        flex: 1,
+        paddingRight: 12,
+    },
+    rightColumn: {
+        flex: 1,
+        justifyContent: 'center',
     },
 });

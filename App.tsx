@@ -10,24 +10,24 @@ export default function App() {
 
   useEffect(() => {
     const initDatabase = async () => {
-      try{
+      try {
         const db = await getConnection();
         await createPlantsTable(db);
         await createCategoriesTable(db);
-        await updateCountdownsAndStatus(db);      
+        await updateCountdownsAndStatus(db);
         setDbReady(true);
         console.log('Database initialized successfully');
-      }catch (error) {
+      } catch (error) {
         console.error('Error initializing database:', error);
       }
     }
     initDatabase();
   }, []);
-  
+
   if (!dbReady) {
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#4CAF50" />
-      </View>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <ActivityIndicator size="large" color="#4CAF50" />
+    </View>
   }
 
   return (

@@ -8,6 +8,7 @@ import {
     SafeAreaView,
     Image,
     ScrollView,
+    useWindowDimensions,
 } from 'react-native';
 import { Plant } from '../models/Plant';
 import { useNavigation } from '@react-navigation/native';
@@ -19,6 +20,8 @@ const MyPlantsTab = () => {
     const navigation = useNavigation<NativeStackNavigationProp<MyPlantsStackParamList>>();
     const [plants, setPlants] = useState<Plant[]>([]);
     const [groupByCategory, setGroupByCategory] = useState(false);
+    const { width, height } = useWindowDimensions();
+    const isLandscape = width > height;
 
     useEffect(() => {
         const focus = navigation.addListener('focus', () => {
@@ -48,65 +51,111 @@ const MyPlantsTab = () => {
         return grouped;
     };
 
+    const renderPlantCard = (item: Plant) => (
+        <TouchableOpacity
+            key={item.key}
+            style={styles.plantCard}
+            onPress={() => navigation.navigate('PlantDetailScreen', item)}
+        >
+            <Image source={{ uri: item.image }} style={styles.plantImage} />
+            <Text>{item.name}</Text>
+            <Text>{item.species}</Text>
+        </TouchableOpacity>
+    );
+
     return (
         <SafeAreaView style={styles.container}>
-            <Text style={styles.title}>My plants</Text>
+            {isLandscape ? (
+                <View style={styles.landscapeWrapper}>
+                    <View style={styles.landscapeSidebar}>
+                        <Text style={styles.title}>My plants</Text>
+                        <View style={styles.topButtonsContainer}>
+                            <TouchableOpacity
+                                style={styles.topButton}
+                                onPress={() => navigation.navigate('CategoriesScreen')}
+                            >
+                                <Text style={styles.topButtonText}>Edit category</Text>
+                            </TouchableOpacity>
 
-            <View style={styles.topButtonsContainer}>
-                <TouchableOpacity
-                    style={styles.topButton}
-                    onPress={() => navigation.navigate('CategoriesScreen')}
-                >
-                    <Text style={styles.topButtonText}>Edit category</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    style={styles.topButton}
-                    onPress={() => setGroupByCategory(!groupByCategory)}
-                >
-                    <Text style={styles.topButtonText}>
-                        {groupByCategory ? 'View all' : 'View by category'}
-                    </Text>
-                </TouchableOpacity>
-            </View>
-
-            {groupByCategory ? (
-                <ScrollView>
-                    {Object.entries(groupPlantsByCategory(plants)).map(([category, group]) => (
-                        <View key={category} style={{ marginBottom: 24 }}>
-                            <Text style={styles.sectionTitle}>{category}</Text>
-                            <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                                {group.map((item) => (
-                                    <TouchableOpacity
-                                        key={item.key}
-                                        style={styles.plantCard}
-                                        onPress={() => navigation.navigate('PlantDetailScreen', item)}
-                                    >
-                                        <Image source={{ uri: item.image }} style={{ width: 50, height: 50 }} />
-                                        <Text>{item.name}</Text>
-                                        <Text>{item.species}</Text>
-                                    </TouchableOpacity>
-                                ))}
-                            </View>
+                            <TouchableOpacity
+                                style={styles.topButton}
+                                onPress={() => setGroupByCategory(!groupByCategory)}
+                            >
+                                <Text style={styles.topButtonText}>
+                                    {groupByCategory ? 'View all' : 'View by category'}
+                                </Text>
+                            </TouchableOpacity>
                         </View>
-                    ))}
-                </ScrollView>
+                    </View>
+
+                    <View style={styles.landscapeContent}>
+                        {groupByCategory ? (
+                            <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
+                                {Object.entries(groupPlantsByCategory(plants)).map(([category, group]) => (
+                                    <View key={category} style={{ marginBottom: 24 }}>
+                                        <Text style={styles.sectionTitle}>{category}</Text>
+                                        <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                                            {group.map(renderPlantCard)}
+                                        </View>
+                                    </View>
+                                ))}
+                            </ScrollView>
+                        ) : (
+                            <FlatList
+                                data={plants}
+                                key={groupByCategory ? 'group' : 'all'}
+                                numColumns={4}
+                                keyExtractor={(item) => item.key.toString()}
+                                renderItem={({ item }) => renderPlantCard(item)}
+                                contentContainerStyle={{ paddingBottom: 80 }}
+                            />
+                        )}
+                    </View>
+                </View>
             ) : (
-                <FlatList
-                    data={plants}
-                    numColumns={3}
-                    keyExtractor={(item) => item.key.toString()}
-                    renderItem={({ item }) => (
+                <>
+                    <Text style={styles.title}>My plants</Text>
+
+                    <View style={styles.topButtonsContainer}>
                         <TouchableOpacity
-                            style={styles.plantCard}
-                            onPress={() => navigation.navigate('PlantDetailScreen', item)}
+                            style={styles.topButton}
+                            onPress={() => navigation.navigate('CategoriesScreen')}
                         >
-                            <Image source={{ uri: item.image }} style={{ width: 50, height: 50 }} />
-                            <Text>{item.name}</Text>
-                            <Text>{item.species}</Text>
+                            <Text style={styles.topButtonText}>Edit category</Text>
                         </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={styles.topButton}
+                            onPress={() => setGroupByCategory(!groupByCategory)}
+                        >
+                            <Text style={styles.topButtonText}>
+                                {groupByCategory ? 'View all' : 'View by category'}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    {groupByCategory ? (
+                        <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
+                            {Object.entries(groupPlantsByCategory(plants)).map(([category, group]) => (
+                                <View key={category} style={{ marginBottom: 24 }}>
+                                    <Text style={styles.sectionTitle}>{category}</Text>
+                                    <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+                                        {group.map(renderPlantCard)}
+                                    </View>
+                                </View>
+                            ))}
+                        </ScrollView>
+                    ) : (
+                        <FlatList
+                            data={plants}
+                            key={groupByCategory ? 'group' : 'all'}
+                            numColumns={3}
+                            keyExtractor={(item) => item.key.toString()}
+                            renderItem={({ item }) => renderPlantCard(item)}
+                            contentContainerStyle={{ paddingBottom: 80 }}
+                        />
                     )}
-                />
+                </>
             )}
 
             <TouchableOpacity
@@ -127,6 +176,18 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         padding: 16,
     },
+    landscapeWrapper: {
+        flexDirection: 'row',
+        flex: 1,
+    },
+    landscapeSidebar: {
+        width: '40%',
+        paddingRight: 12,
+    },
+    landscapeContent: {
+        flex: 1,
+        paddingLeft: 12,
+    },
     title: {
         fontSize: 32,
         fontWeight: 'bold',
@@ -138,6 +199,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         gap: 12,
         marginBottom: 16,
+        flexWrap: 'wrap',
     },
     topButton: {
         backgroundColor: '#4CAF50',
@@ -160,14 +222,17 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     addButton: {
-        alignSelf: 'flex-end',
-        margin: 24,
+        position: 'absolute',
+        bottom: 24,
+        right: 24,
         backgroundColor: '#4CAF50',
         width: 50,
         height: 50,
         borderRadius: 25,
         alignItems: 'center',
         justifyContent: 'center',
+        elevation: 3,
+        zIndex: 10,
     },
     addText: {
         color: '#fff',
@@ -175,8 +240,13 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     plantCard: {
-        paddingTop: 36,
+        paddingTop: 24,
         width: '33.33%',
         alignItems: 'center',
+    },
+    plantImage: {
+        width: 50,
+        height: 50,
+        marginBottom: 6,
     },
 });

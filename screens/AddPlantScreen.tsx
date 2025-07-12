@@ -9,9 +9,10 @@ import {
     TouchableOpacity,
     ScrollView,
     Alert,
+    useWindowDimensions,
 } from 'react-native';
 import { insertPlant, updatePlant, getConnection, getCategories } from '../db';
-import { Plant, PlantState } from '../models/Plant';
+import { PlantState } from '../models/Plant';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -34,27 +35,29 @@ const AddPlantScreen = () => {
     const [date, setDate] = useState(new Date());
     const [imageUri, setImageUri] = useState<string>('');
     const [category, setCategory] = useState<string>('');
+    const [categories, setCategories] = useState<string[]>([]);
 
-    const[categories, setCategories] = useState<string[]>([]);
+    const { width, height } = useWindowDimensions();
+    const isLandscape = width > height;
 
     useEffect(() => {
-        const loadCategories = async() => {
+        const loadCategories = async () => {
             const db = await getConnection();
             const categories = await getCategories(db);
             setCategories(categories);
-        }
+        };
         loadCategories();
 
         if (plantToEdit) {
             setName(plantToEdit.name || '');
             setSpecies(plantToEdit.species || '');
-            setAcquisitionDate(plantToEdit.ownedSince? new Date(plantToEdit.ownedSince).toISOString().split('T')[0] : '');
+            setAcquisitionDate(plantToEdit.ownedSince ? new Date(plantToEdit.ownedSince).toISOString().split('T')[0] : '');
             setPruning(String(plantToEdit.pruneFrequency || ''));
             setRepotting(String(plantToEdit.repotFrequency || ''));
             setWatering(String(plantToEdit.waterFrequency || ''));
             setStatus(plantToEdit.state);
             setNotes(plantToEdit.notes || '');
-            setImageUri(plantToEdit.image || null);
+            setImageUri(plantToEdit.image || '');
             setCategory(plantToEdit.category);
         }
     }, []);
@@ -69,15 +72,15 @@ const AddPlantScreen = () => {
         setStatus(PlantState.Healthy);
         setNotes('');
         setImageUri('');
+        setCategory('');
     };
 
     const handleSave = async () => {
-
         if (!name.trim() || !species.trim() || !acquisitionDate || !watering || !repotting || !pruning) {
             Alert.alert('Error', 'You have to fill in all required fields! (*)');
             return;
         }
-        
+
         try {
             const db = await getConnection();
 
@@ -92,7 +95,7 @@ const AddPlantScreen = () => {
                 state: status,
                 image: imageUri ? imageUri : 'https://img.icons8.com/ios-filled/50/potted-plant.png',
                 notes: notes,
-                category: category ? category : null
+                category: category || '',
             };
 
             if (plantToEdit) {
@@ -136,32 +139,15 @@ const AddPlantScreen = () => {
         }
     };
 
-    return (
-        <ScrollView contentContainerStyle={styles.container}>
-            <Button title="Choose an image" onPress={pickImage} />
-
-            {imageUri ? (
-                <Image
-                    source={{ uri: imageUri }}
-                    style={{ width: 200, height: 200, marginTop: 10, alignSelf: 'center' }}
-                />
-            ) : (
-                <View style={styles.imagePlaceholder}>
-                    <Text style={styles.imageText}>No image selected</Text>
-                </View>
-            )}
-
+    const FormFields = () => (
+        <>
             <View style={styles.row}>
                 <View style={styles.inputGroup}>
                     <Text>Name*:</Text>
                     <TextInput
                         style={styles.input}
                         value={name}
-                        onChangeText={(text) => {
-                            if (/^[a-zA-ZÀ-ÿ0-9]*$/.test(text)) {
-                                setName(text);
-                            }
-                        }}
+                        onChangeText={(text) => /^[a-zA-ZÀ-ÿ0-9]*$/.test(text) && setName(text)}
                         maxLength={50}
                     />
                 </View>
@@ -170,11 +156,7 @@ const AddPlantScreen = () => {
                     <TextInput
                         style={styles.input}
                         value={species}
-                        onChangeText={(text) => {
-                            if (/^[a-zA-ZÀ-ÿ\s]*$/.test(text)) {
-                                setSpecies(text);
-                            }
-                        }}
+                        onChangeText={(text) => /^[a-zA-ZÀ-ÿ\s]*$/.test(text) && setSpecies(text)}
                         maxLength={50}
                     />
                 </View>
@@ -241,17 +223,19 @@ const AddPlantScreen = () => {
                     </Picker>
                 </View>
             </View>
+
             <View style={styles.inputGroup}>
                 <Text>Category:</Text>
                 <View style={styles.pickerContainer}>
                     <Picker selectedValue={category} onValueChange={(value) => setCategory(value)}>
-                        <Picker.Item label="No category" value={''}/>
+                        <Picker.Item label="No category" value={''} />
                         {categories.map((cat) => (
                             <Picker.Item label={cat} value={cat} key={cat} />
                         ))}
                     </Picker>
                 </View>
             </View>
+
             <View style={styles.inputGroup}>
                 <Text>Personal notes:</Text>
                 <TextInput
@@ -262,6 +246,40 @@ const AddPlantScreen = () => {
                     maxLength={750}
                 />
             </View>
+        </>
+    );
+
+    return (
+        <ScrollView contentContainerStyle={styles.container}>
+            {isLandscape ? (
+                <View style={{ flexDirection: 'row', gap: 16 }}>
+                    <View style={{ flex: 1 }}>
+                        <Button title="Choose an image" onPress={pickImage} />
+                        {imageUri ? (
+                            <Image source={{ uri: imageUri }} style={{ width: 200, height: 200, marginTop: 10, alignSelf: 'center' }} />
+                        ) : (
+                            <View style={styles.imagePlaceholder}>
+                                <Text style={styles.imageText}>No image selected</Text>
+                            </View>
+                        )}
+                    </View>
+                    <View style={{ flex: 1 }}>
+                        {FormFields()}
+                    </View>
+                </View>
+            ) : (
+                <>
+                    <Button title="Choose an image" onPress={pickImage} />
+                    {imageUri ? (
+                        <Image source={{ uri: imageUri }} style={{ width: 200, height: 200, marginTop: 10, alignSelf: 'center' }} />
+                    ) : (
+                        <View style={styles.imagePlaceholder}>
+                            <Text style={styles.imageText}>No image selected</Text>
+                        </View>
+                    )}
+                    {FormFields()}
+                </>
+            )}
 
             <View style={styles.buttonRow}>
                 <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
@@ -287,7 +305,7 @@ const styles = StyleSheet.create({
         height: 150,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 20,
+        marginVertical: 20,
     },
     imageText: {
         fontWeight: 'bold',
