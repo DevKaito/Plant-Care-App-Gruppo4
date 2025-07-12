@@ -7,6 +7,7 @@ export const getConnection = async(): Promise<SQLite.SQLiteDatabase> =>{
     try{
         if(!db) {
             db = SQLite.openDatabaseSync('db.db');
+            await db.execAsync(`PRAGMA foreign_keys = ON;`);
         }
         return db;
     } catch (error) {
@@ -31,7 +32,8 @@ export const createPlantsTable = async (db: SQLite.SQLiteDatabase) => {
         waterCountdown INTEGER,
         repotCountdown INTEGER,
         pruneCountdown INTEGER,
-        category TEXT
+        category TEXT,
+        FOREIGN KEY (category) REFERENCES categories(name) ON DELETE SET NULL 
     );
   `);
 };

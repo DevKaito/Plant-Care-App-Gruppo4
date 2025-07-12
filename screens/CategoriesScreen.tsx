@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import CheckBox from "expo-checkbox"
 import { deleteCategories, getCategories, getConnection, insertCategory } from "../db";
+import { SQLiteDatabase } from "expo-sqlite";
 
 const CategoriesScreen = () => {
     const [categories, setCategories] = useState<string[]>([]);
@@ -162,3 +163,7 @@ const styles = StyleSheet.create({
 });
 
 export default CategoriesScreen;
+function updatePlantsCategories(db: SQLiteDatabase, removed: string[]) {
+    throw new Error("Function not implemented.");
+}
+
