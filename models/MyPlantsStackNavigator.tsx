@@ -20,10 +20,9 @@ export default function MyPlantsStackNavigator() {
   return (
     <Stack.Navigator initialRouteName="MyPlantsTab">
       <Stack.Screen name="MyPlantsTab" component={MyPlantsTab} options={{ headerShown: false }} />
-      <Stack.Screen name="AddPlantScreen" component={AddPlantScreen} options={{ title: 'Aggiungi Pianta' }} />
-      <Stack.Screen name="PlantDetailScreen" component={PlantDetailScreen} options={{ title: 'Dettaglio Pianta' }} />
-      <Stack.Screen name="CategoriesScreen" component={CategoriesScreen} options={{ title: 'Categorie' }} />
+      <Stack.Screen name="AddPlantScreen" component={AddPlantScreen} options={{ title: 'Add Plant' }} />
+      <Stack.Screen name="PlantDetailScreen" component={PlantDetailScreen} options={{ title: 'Plant Details' }} />
+      <Stack.Screen name="CategoriesScreen" component={CategoriesScreen} options={{ title: 'Categories' }} />
     </Stack.Navigator>
   );
 }
-

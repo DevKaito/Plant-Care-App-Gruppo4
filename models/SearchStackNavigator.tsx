@@ -18,8 +18,8 @@ export default function HomeStackNavigator() {
     return (
         <Stack.Navigator initialRouteName="SearchTab">
             <Stack.Screen name="SearchTab" component={SearchTab} options={{ headerShown: false }} />
-            <Stack.Screen name="PlantDetailScreen" component={PlantDetailScreen} options={{ title: 'Dettaglio Pianta' }} />
-            <Stack.Screen name="AddPlantScreen" component={AddPlantScreen} options={{ title: 'Aggiungi Pianta' }} />
+            <Stack.Screen name="PlantDetailScreen" component={PlantDetailScreen} options={{ title: 'Plant Details' }} />
+            <Stack.Screen name="AddPlantScreen" component={AddPlantScreen} options={{ title: 'Add Plant' }} />
         </Stack.Navigator>
     );
 }

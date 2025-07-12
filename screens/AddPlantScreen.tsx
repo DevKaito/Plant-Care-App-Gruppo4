@@ -74,7 +74,7 @@ const AddPlantScreen = () => {
     const handleSave = async () => {
 
         if (!name.trim() || !species.trim() || !acquisitionDate || !watering || !repotting || !pruning) {
-            Alert.alert('Errore', 'Compila tutti i campi obbligatori! (*)');
+            Alert.alert('Error', 'You have to fill in all required fields! (*)');
             return;
         }
         
@@ -104,8 +104,8 @@ const AddPlantScreen = () => {
             resetForm();
             navigation.goBack();
         } catch (error) {
-            console.error('Errore: ', error);
-            Alert.alert('Errore, impossibile salvare la pianta!');
+            console.error('Error: ', error);
+            Alert.alert('Error, unable to save the plant!');
         }
     };
 
@@ -138,7 +138,7 @@ const AddPlantScreen = () => {
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
-            <Button title="Scegli immagine" onPress={pickImage} />
+            <Button title="Choose an image" onPress={pickImage} />
 
             {imageUri ? (
                 <Image
@@ -147,13 +147,13 @@ const AddPlantScreen = () => {
                 />
             ) : (
                 <View style={styles.imagePlaceholder}>
-                    <Text style={styles.imageText}>Nessuna immagine selezionata</Text>
+                    <Text style={styles.imageText}>No image selected</Text>
                 </View>
             )}
 
             <View style={styles.row}>
                 <View style={styles.inputGroup}>
-                    <Text>Nome*:</Text>
+                    <Text>Name*:</Text>
                     <TextInput
                         style={styles.input}
                         value={name}
@@ -166,7 +166,7 @@ const AddPlantScreen = () => {
                     />
                 </View>
                 <View style={styles.inputGroup}>
-                    <Text>Specie*:</Text>
+                    <Text>Species*:</Text>
                     <TextInput
                         style={styles.input}
                         value={species}
@@ -181,10 +181,10 @@ const AddPlantScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-                <Text>Data acquisizione*:</Text>
+                <Text>Acquisition date*:</Text>
                 <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.input}>
                     <Text style={{ color: acquisitionDate ? 'black' : 'gray' }}>
-                        {acquisitionDate || 'Seleziona una data'}
+                        {acquisitionDate || 'Select a date'}
                     </Text>
                 </TouchableOpacity>
                 {showDatePicker && (
@@ -199,7 +199,7 @@ const AddPlantScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-                <Text>Frequenza potatura*:</Text>
+                <Text>Pruning frequency*:</Text>
                 <TextInput
                     style={styles.input}
                     keyboardType="numeric"
@@ -210,7 +210,7 @@ const AddPlantScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-                <Text>Frequenza rinvaso*:</Text>
+                <Text>Repotting frequency*:</Text>
                 <TextInput
                     style={styles.input}
                     keyboardType="numeric"
@@ -221,7 +221,7 @@ const AddPlantScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-                <Text>Frequenza innaffiatura*:</Text>
+                <Text>Watering frequency*:</Text>
                 <TextInput
                     style={styles.input}
                     keyboardType="numeric"
@@ -232,20 +232,20 @@ const AddPlantScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-                <Text>Stato della pianta*:</Text>
+                <Text>Plant status*:</Text>
                 <View style={styles.pickerContainer}>
                     <Picker selectedValue={status} onValueChange={(itemValue) => setStatus(itemValue)}>
-                        <Picker.Item label="Sana" value={PlantState.Healthy} />
-                        <Picker.Item label="Da controllare" value={PlantState.ToCheck} />
-                        <Picker.Item label="Malata" value={PlantState.Sick} />
+                        <Picker.Item label="Healthy" value={PlantState.Healthy} />
+                        <Picker.Item label="To check" value={PlantState.ToCheck} />
+                        <Picker.Item label="Sick" value={PlantState.Sick} />
                     </Picker>
                 </View>
             </View>
             <View style={styles.inputGroup}>
-                <Text>Categoria:</Text>
+                <Text>Category:</Text>
                 <View style={styles.pickerContainer}>
                     <Picker selectedValue={category} onValueChange={(value) => setCategory(value)}>
-                        <Picker.Item label="Nessuna categoria" value={''}/>
+                        <Picker.Item label="No category" value={''}/>
                         {categories.map((cat) => (
                             <Picker.Item label={cat} value={cat} key={cat} />
                         ))}
@@ -253,7 +253,7 @@ const AddPlantScreen = () => {
                 </View>
             </View>
             <View style={styles.inputGroup}>
-                <Text>Note personali:</Text>
+                <Text>Personal notes:</Text>
                 <TextInput
                     style={[styles.input, { height: 80 }]}
                     value={notes}

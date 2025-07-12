@@ -26,7 +26,7 @@ const CategoriesScreen = () => {
                 setCategories(categories);
             }
             catch(error){
-                console.error("Errore nel caricamento delle categorie", error);
+                console.error("Error loading categories", error);
             }
         }
 
@@ -35,11 +35,11 @@ const CategoriesScreen = () => {
 
     const handleAddCategory = async () => {
         if (newCategory.trim() === "") {
-            Alert.alert("Errore", "Il nome della categoria non può essere vuoto.");
+            Alert.alert("Error", "Category name cannot be empty.");
             return;
         }
         if (categories.includes(newCategory.trim())) {
-            Alert.alert("Errore", "Questa categoria esiste già.");
+            Alert.alert("Error", "This category already exists.");
             return;
         }
         const db = await getConnection();
@@ -85,18 +85,18 @@ const CategoriesScreen = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Categorie</Text>
+            <Text style={styles.title}>Categories</Text>
 
             {!removalMode && (
                 <>
                     <View style={styles.inputContainer}>
                         <TextInput
-                            placeholder="Nuova categoria"
+                            placeholder="New category"
                             value={newCategory}
                             onChangeText={setNewCategory}
                             style={styles.input}
                         />
-                        <Button title="Aggiungi" onPress={handleAddCategory} />
+                        <Button title="Add" onPress={handleAddCategory} />
                     </View>
                 </>
             )}
@@ -109,11 +109,11 @@ const CategoriesScreen = () => {
 
             <View style={styles.buttonContainer}>
                 {!removalMode ? (
-                    <Button title="Rimuovi categorie" onPress={toggleRemovalMode} />
+                    <Button title="Remove categories" onPress={toggleRemovalMode} />
                 ) : (
                     <>
-                        <Button title="Conferma rimozione" color="red" onPress={confirmRemoval} />
-                        <Button title="Annulla" onPress={toggleRemovalMode} />
+                        <Button title="Confirm removal" color="red" onPress={confirmRemoval} />
+                        <Button title="Cancel" onPress={toggleRemovalMode} />
                     </>
                 )}
             </View>

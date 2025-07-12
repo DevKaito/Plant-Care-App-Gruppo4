@@ -30,9 +30,9 @@ export default function SearchScreen() {
     const [categories, setCategories] = useState<string[]>([]);
 
     const statusItems = [
-        { label: "Sana", value: PlantState.Healthy.toLowerCase() },
-        { label: "Da controllare", value: PlantState.ToCheck.toLowerCase() },
-        { label: "Malata", value: PlantState.Sick.toLowerCase() },
+        { label: "Healthy", value: PlantState.Healthy.toLowerCase() },
+        { label: "To check", value: PlantState.ToCheck.toLowerCase() },
+        { label: "Sick", value: PlantState.Sick.toLowerCase() },
     ];
 
     useEffect(() => {
@@ -49,7 +49,7 @@ export default function SearchScreen() {
                     const uniqueCategories = [...new Set(allPlants.map(p => p.category).filter(cat => cat && cat.trim() !== ''))];
                     setCategories(uniqueCategories);
                 } catch(error) {
-                    console.error('Errore ricerca', error)
+                    console.error('Search error', error)
                 }
             };
             loadPlants();
@@ -105,7 +105,7 @@ export default function SearchScreen() {
                     items={statusItems}
                     setOpen={setOpenStatus}
                     setValue={setStatusFilter}
-                    placeholder="Stato pianta"
+                    placeholder="Plant state"
                     dropDownDirection="BOTTOM"
                     style={styles.dropdown}
                     dropDownContainerStyle={{ backgroundColor: '#fff' }}
@@ -121,7 +121,7 @@ export default function SearchScreen() {
                     items={categories.map(cat => ({ label: cat, value: cat }))}
                     setOpen={setOpenCategory}
                     setValue={setCategoryFilter}
-                    placeholder="Categorie"
+                    placeholder="Categories"
                     dropDownDirection="BOTTOM"
                     style={styles.dropdown}
                     dropDownContainerStyle={{ backgroundColor: '#fff' }}
@@ -151,7 +151,7 @@ export default function SearchScreen() {
                     </TouchableOpacity>
                 )}
                 ListEmptyComponent={() => (
-                    <Text style={styles.noResultsText}>Nessun risultato trovato!</Text>
+                    <Text style={styles.noResultsText}>No results found!</Text>
                 )}
             />
         )}

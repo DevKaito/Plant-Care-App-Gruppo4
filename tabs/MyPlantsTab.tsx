@@ -28,7 +28,7 @@ const MyPlantsTab = () => {
                     const plantData = await getPlants(db);
                     setPlants(plantData);
                 } catch (error) {
-                    console.error('Errore caricamento piante:', error);
+                    console.error('Plant loading error:', error);
                 }
             };
 
@@ -41,7 +41,7 @@ const MyPlantsTab = () => {
     const groupPlantsByCategory = (plants: Plant[]) => {
         const grouped: { [category: string]: Plant[] } = {};
         plants.forEach((plant) => {
-            const category = plant.category || 'Senza categoria';
+            const category = plant.category || 'With no category';
             if (!grouped[category]) grouped[category] = [];
             grouped[category].push(plant);
         });
@@ -50,15 +50,14 @@ const MyPlantsTab = () => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <Text style={styles.title}>Le mie piante</Text>
+            <Text style={styles.title}>My plants</Text>
 
-            {/* Pulsanti in alto */}
             <View style={styles.topButtonsContainer}>
                 <TouchableOpacity
                     style={styles.topButton}
                     onPress={() => navigation.navigate('CategoriesScreen')}
                 >
-                    <Text style={styles.topButtonText}>Modifica categoria</Text>
+                    <Text style={styles.topButtonText}>Edit category</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -66,7 +65,7 @@ const MyPlantsTab = () => {
                     onPress={() => setGroupByCategory(!groupByCategory)}
                 >
                     <Text style={styles.topButtonText}>
-                        {groupByCategory ? 'Visualizza tutte' : 'Visualizza per categoria'}
+                        {groupByCategory ? 'View all' : 'View by category'}
                     </Text>
                 </TouchableOpacity>
             </View>
