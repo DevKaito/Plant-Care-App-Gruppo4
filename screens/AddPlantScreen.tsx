@@ -92,7 +92,7 @@ const AddPlantScreen = () => {
                 state: status,
                 image: imageUri ? imageUri : 'https://img.icons8.com/ios-filled/50/potted-plant.png',
                 notes: notes,
-                category: category ? category : ''
+                category: category ? category : null
             };
 
             if (plantToEdit) {

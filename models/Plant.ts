@@ -15,5 +15,5 @@ export interface Plant {
     image: string;
     state: PlantState;
     notes: string;
-    category: string;
+    category: string | null;
 }
