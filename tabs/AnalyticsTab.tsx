@@ -122,9 +122,6 @@ const categoryPieData = categoryEntries.map(([category, count], i) => {
             )}
 
         </View>
-
-        //Attività di cura eseguite (grafico mensile) <--- Istogramma.
-        
     );
 };
 

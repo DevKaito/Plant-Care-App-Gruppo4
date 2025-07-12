@@ -55,6 +55,10 @@ const HomeTab = () => {
 
             <Text style={styles.sectionTitle}>Recently added plants</Text>
 
+            {plants.length === 0 ? (
+                <Text style={styles.emptyMessage}>There are no recent plants.</Text>
+            ) : (
+
             <FlatList
                 data={plants.slice(0, 3)}
                 horizontal
@@ -78,8 +82,11 @@ const HomeTab = () => {
                     </TouchableOpacity>
                 )}
             />
-
+            )}
             <View style={styles.boxContainer}>
+            {curablePlants.length === 0 ? (
+                <Text style={styles.emptyMessage}>There are no curable plants.</Text>
+            ) : (
                 <FlatList
                     data={curablePlants}
                     keyExtractor={(item) => item.key.toString()}
@@ -112,6 +119,7 @@ const HomeTab = () => {
                         </TouchableOpacity>
                     )}
                 />
+            )}
             </View>
 
         </SafeAreaView>
@@ -225,5 +233,12 @@ const styles = StyleSheet.create({
     illness: {
         fontStyle: 'italic',
         fontSize: 12,
+    },
+    emptyMessage: {
+        textAlign: 'center',
+        fontSize: 16,
+        fontStyle: 'italic',
+        color: '#888',
+        marginVertical: 20,
     },
 });

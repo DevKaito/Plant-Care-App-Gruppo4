@@ -1,4 +1,3 @@
-// npm install @react-native-picker/picker (picker immagini (non funziona per ora)), npm install @react-navigation/native-stack () , npx expo install @expo/vector-icons (per le icone)
 import React, { useState, useEffect } from 'react';
 import {
     View,

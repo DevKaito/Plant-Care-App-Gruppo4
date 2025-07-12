@@ -71,7 +71,6 @@ const MyPlantsTab = () => {
                 </TouchableOpacity>
             </View>
 
-            {/* Lista piante (piatta o per categoria) */}
             {groupByCategory ? (
                 <ScrollView>
                     {Object.entries(groupPlantsByCategory(plants)).map(([category, group]) => (
@@ -111,7 +110,6 @@ const MyPlantsTab = () => {
                 />
             )}
 
-            {/* Bottone aggiungi */}
             <TouchableOpacity
                 style={styles.addButton}
                 onPress={() => navigation.navigate('AddPlantScreen')}

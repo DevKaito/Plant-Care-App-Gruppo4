@@ -33,7 +33,6 @@ const CategoriesScreen = () => {
         loadCategories();
     }, []);
 
-    //aggiunta di una categoria
     const handleAddCategory = async () => {
         if (newCategory.trim() === "") {
             Alert.alert("Errore", "Il nome della categoria non può essere vuoto.");
