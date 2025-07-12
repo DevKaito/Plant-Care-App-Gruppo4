@@ -29,7 +29,7 @@ const HomeTab = () => {
                 setPlants(recentPlants);
             }
             catch (error) {
-                console.error('Errore nel caricamento delle piante recenti:', error);
+                console.error('Error loading recent plants:', error);
             }
             };
             loadRecentPlants();
@@ -41,7 +41,7 @@ const HomeTab = () => {
                     setCurablePlants(curablePlants);
                 }
                 catch (error) {
-                    console.error('Errore nel caricamento delle piante curabili:', error);
+                    console.error('Error loading curable plants:', error);
                 }
             };
             loadCurablePlants();
@@ -98,7 +98,6 @@ const HomeTab = () => {
                             <View style={styles.textContainer}>
                                 <Text style={styles.name}>{item.name}</Text>
                                 <Text style={styles.species}>{item.species}</Text>
-                                <Text style={styles.illness}>Motivation: {item.name}</Text>
                             </View>
 
                             <TouchableOpacity
@@ -106,10 +105,10 @@ const HomeTab = () => {
                                     try {
                                         const db = await getConnection();
                                         await updatePlant(db, item, true);
-                                        console.log('Pianta curata:', item.name);
+                                        console.log('Cured plant:', item.name);
                                         navigation.replace('HomeTab');
                                     } catch (error) {
-                                        console.error('Errore durante la cura della pianta:', error);
+                                        console.error('Error while caring for the plant:', error);
                                     }
                                 }}
                                 style={styles.button}

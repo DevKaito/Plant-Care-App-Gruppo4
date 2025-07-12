@@ -35,15 +35,15 @@ export default function PlantDetailScreen({ route }: { route: any }) {
 
     const handleDelete = async () => {
         Alert.alert(
-            'Conferma eliminazione',
-            'Sei sicuro di voler eliminare questa pianta?',
+            'Confirm deletion',
+            'Are you sure you want to remove this plant?',
             [
                 {
-                    text: 'Annulla',
+                    text: 'Cancel',
                     style: 'cancel',
                 },
                 {
-                    text: 'Elimina',
+                    text: 'Delete',
                     style: 'destructive',
                     onPress: async () => {
                         try {
@@ -51,8 +51,8 @@ export default function PlantDetailScreen({ route }: { route: any }) {
                             await deletePlant(db, updatedPlant.key);
                             navigation.goBack();
                         } catch (error) {
-                            console.error('Errore durante eliminazione:', error);
-                            Alert.alert('Errore', 'Impossibile eliminare la pianta');
+                            console.error('Error while deleting:', error);
+                            Alert.alert('Error', 'Impossible to eliminate the plant');
                         }
                     },
                 },
@@ -62,23 +62,23 @@ export default function PlantDetailScreen({ route }: { route: any }) {
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
-            <Text style={styles.title}>Dettaglio Pianta</Text>
-            <Text style={styles.label}>🌱 Nome: <Text style={styles.value}>{updatedPlant.name}</Text></Text>
-            <Text style={styles.label}>🔖 Specie: <Text style={styles.value}>{updatedPlant.species}</Text></Text>
-            <Text style={styles.label}>📅 Acquisizione: <Text style={styles.value}>{new Date(updatedPlant.ownedSince).toISOString().split('T')[0]}</Text></Text>
-            <Text style={styles.label}>💧 Innaffiatura: <Text style={styles.value}>{updatedPlant.waterFrequency} giorni</Text></Text>
-            <Text style={styles.label}>🌿 Potatura: <Text style={styles.value}>{updatedPlant.pruneFrequency} giorni</Text></Text>
-            <Text style={styles.label}>🪴 Rinvaso: <Text style={styles.value}>{updatedPlant.repotFrequency} giorni</Text></Text>
-            <Text style={styles.label}>❤️ Stato: <Text style={styles.value}>{updatedPlant.state}</Text></Text>
-            <Text style={styles.label}>🗂️ Categorie: <Text style={styles.value}>{updatedPlant.category || '-'}</Text></Text>
-            <Text style={styles.label}>📝 Note: <Text style={styles.value}>{updatedPlant.notes || '-'}</Text></Text>
+            <Text style={styles.title}>Plant detail</Text>
+            <Text style={styles.label}>🌱 Name: <Text style={styles.value}>{updatedPlant.name}</Text></Text>
+            <Text style={styles.label}>🔖 Species: <Text style={styles.value}>{updatedPlant.species}</Text></Text>
+            <Text style={styles.label}>📅 Acquisition: <Text style={styles.value}>{new Date(updatedPlant.ownedSince).toISOString().split('T')[0]}</Text></Text>
+            <Text style={styles.label}>💧 Watering: <Text style={styles.value}>{updatedPlant.waterFrequency} days</Text></Text>
+            <Text style={styles.label}>🌿 Pruning: <Text style={styles.value}>{updatedPlant.pruneFrequency} days</Text></Text>
+            <Text style={styles.label}>🪴 Repotting: <Text style={styles.value}>{updatedPlant.repotFrequency} days</Text></Text>
+            <Text style={styles.label}>❤️ State: <Text style={styles.value}>{updatedPlant.state}</Text></Text>
+            <Text style={styles.label}>🗂️ Categories: <Text style={styles.value}>{updatedPlant.category || '-'}</Text></Text>
+            <Text style={styles.label}>📝 Notes: <Text style={styles.value}>{updatedPlant.notes || '-'}</Text></Text>
 
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={[styles.button, styles.editButton]} onPress={handleEdit}>
-                    <Text style={styles.buttonText}>Modifica</Text>
+                    <Text style={styles.buttonText}>Edit</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[styles.button, styles.deleteButton]} onPress={handleDelete}>
-                    <Text style={styles.buttonText}>Elimina</Text>
+                    <Text style={styles.buttonText}>Delete</Text>
                 </TouchableOpacity>
             </View>
         </ScrollView>
