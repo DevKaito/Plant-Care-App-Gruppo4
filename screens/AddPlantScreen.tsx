@@ -81,6 +81,13 @@ const AddPlantScreen = () => {
             return;
         }
 
+        if (
+        parseInt(watering) <= 0 || parseInt(repotting) <= 0 || parseInt(pruning) <= 0
+    ) {
+        Alert.alert('Error', 'Frequencies must be greater than 0!');
+        return;
+    }
+
         try {
             const db = await getConnection();
 

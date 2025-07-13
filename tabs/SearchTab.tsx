@@ -48,7 +48,6 @@ export default function SearchScreen() {
                     const db = await getConnection();
                     const allPlants = await getPlants(db);
 
-                    // ✅ Rimozione di null in modo tipizzato
                     const uniqueCategories = [...new Set(
                         allPlants
                             .map(p => p.category)
