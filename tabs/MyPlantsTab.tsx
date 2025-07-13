@@ -54,7 +54,10 @@ const MyPlantsTab = () => {
     const renderPlantCard = (item: Plant) => (
         <TouchableOpacity
             key={item.key}
-            style={styles.plantCard}
+            style={[
+                styles.plantCard,
+                { width: isLandscape ? `${100 / 4}%` : `${100 / 3}%` } // 4 colonne in landscape, 3 in portrait
+            ]}
             onPress={() => navigation.navigate('PlantDetailScreen', item)}
         >
             <Image source={{ uri: item.image }} style={styles.plantImage} />
@@ -241,7 +244,6 @@ const styles = StyleSheet.create({
     },
     plantCard: {
         paddingTop: 24,
-        width: '33.33%',
         alignItems: 'center',
     },
     plantImage: {
