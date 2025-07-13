@@ -96,22 +96,26 @@ export const updatePlant = async (db: SQLite.SQLiteDatabase, plant: Plant, cure:
         const row = results[0];
 
         const updates: string[] = [];
-
-        if (row && row.waterCountdown === 0) {
-            updates.push("waterCountdown = ?");
-            params.push(plant.waterFrequency)
+        if(row.pruneCountdown === 0 || row.waterCountdown === 0 || row.repotCountdown === 0){
+            if (row && row.waterCountdown === 0) {
+                updates.push("waterCountdown = ?");
+                params.push(plant.waterFrequency)
+            }
+            if (row && row.repotCountdown === 0) {
+                updates.push("repotCountdown = ?");
+                params.push(plant.repotFrequency)
+            }
+            if (row && row.pruneCountdown === 0) {
+                updates.push("pruneCountdown = ?");
+                params.push(plant.pruneFrequency)
+            }
+            updateQuery = `UPDATE plants SET ${updates.join(", ")}, status = ? WHERE id = ?`
         }
-        if (row && row.repotCountdown === 0) {
-            updates.push("repotCountdown = ?");
-            params.push(plant.repotFrequency)
+        else{
+            updateQuery = `UPDATE plants SET status = ? WHERE id = ?`
+            
         }
-        if (row && row.pruneCountdown === 0) {
-            updates.push("pruneCountdown = ?");
-            params.push(plant.pruneFrequency)
-        }
-        params.push(PlantState.Healthy, plant.key);
-        
-        updateQuery = `UPDATE plants SET ${updates.join(", ")}, status = ? WHERE id = ?`
+        params.push(PlantState.Healthy, plant.key)
     }
     await db.runAsync(updateQuery, params);
 };
