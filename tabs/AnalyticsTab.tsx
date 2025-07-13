@@ -4,7 +4,6 @@ import {
     Text,
     StyleSheet,
     ScrollView,
-    Dimensions,
     useWindowDimensions,
 } from 'react-native';
 import { getConnection, getPlants } from '../db';
@@ -46,19 +45,21 @@ const AnalysisTab = () => {
     const categoryEntries = Object.entries(categoryCounts);
     const total = plants.length;
 
-    const categoryPieData = categoryEntries.map(([category, count], i) => {
-        const percentage = ((count / total) * 100).toFixed(0);
-        const label =
-            categoryEntries.length === 1 ? `${category} - ${percentage}%` : category;
+    const categoryPieData = categoryEntries
+        .map(([category, count], i) => {
+            const percentage = ((count / total) * 100).toFixed(0);
+            const label =
+                categoryEntries.length === 1 ? `${category} - ${percentage}%` : category;
 
-        return {
-            name: label,
-            count,
-            color: ['#3F51B5', '#009688', '#FFC107', '#E91E63', '#9C27B0'][i % 5],
-            legendFontColor: '#333',
-            legendFontSize: 10.5,
-        };
-    }).filter((item) => item.count > 0);
+            return {
+                name: label,
+                count,
+                color: ['#3F51B5', '#009688', '#FFC107', '#E91E63', '#9C27B0'][i % 5],
+                legendFontColor: '#333',
+                legendFontSize: isLandscape ? 10 : 12,
+            };
+        })
+        .filter((item) => item.count > 0);
 
     const pieData = [
         {
@@ -66,29 +67,37 @@ const AnalysisTab = () => {
             count: countByStatus('Healthy'),
             color: '#4CAF50',
             legendFontColor: '#333',
-            legendFontSize: 12,
+            legendFontSize: isLandscape ? 10 : 12,
         },
         {
             name: 'Plants to check',
             count: countByStatus('To Check'),
             color: '#FF9800',
             legendFontColor: '#333',
-            legendFontSize: 12,
+            legendFontSize: isLandscape ? 10 : 12,
         },
         {
             name: 'Sick plants',
             count: countByStatus('Sick'),
             color: '#F44336',
             legendFontColor: '#333',
-            legendFontSize: 12,
+            legendFontSize: isLandscape ? 10 : 12,
         },
     ].filter((item) => item.count > 0);
 
     const chartWidth = isLandscape ? width / 2 - 40 : width - 32;
+    const chartHeight = isLandscape ? 180 : 220;
 
     return (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-            <Text style={styles.title}>Total number of plants: {plants.length}</Text>
+            <Text
+                style={[
+                    styles.title,
+                    { fontSize: isLandscape ? 18 : 22 },
+                ]}
+            >
+                Total number of plants: {plants.length}
+            </Text>
 
             <View
                 style={[
@@ -98,7 +107,14 @@ const AnalysisTab = () => {
             >
                 {categoryPieData.length > 0 && (
                     <View style={[styles.chartBox, { width: chartWidth }]}>
-                        <Text style={styles.chartTitle}>Distribution by Category</Text>
+                        <Text
+                            style={[
+                                styles.chartTitle,
+                                { fontSize: isLandscape ? 14 : 16 },
+                            ]}
+                        >
+                            Distribution by Category
+                        </Text>
                         <PieChart
                             data={categoryPieData.map((item) => ({
                                 name: item.name,
@@ -108,7 +124,7 @@ const AnalysisTab = () => {
                                 legendFontSize: item.legendFontSize,
                             }))}
                             width={chartWidth}
-                            height={220}
+                            height={chartHeight}
                             chartConfig={{
                                 backgroundGradientFrom: 'white',
                                 backgroundGradientTo: 'white',
@@ -117,14 +133,21 @@ const AnalysisTab = () => {
                             }}
                             accessor="population"
                             backgroundColor="transparent"
-                            paddingLeft="0"
+                            paddingLeft="10"
                         />
                     </View>
                 )}
 
                 {pieData.length > 0 && (
                     <View style={[styles.chartBox, { width: chartWidth }]}>
-                        <Text style={styles.chartTitle}>Distribution by Status</Text>
+                        <Text
+                            style={[
+                                styles.chartTitle,
+                                { fontSize: isLandscape ? 14 : 16 },
+                            ]}
+                        >
+                            Distribution by Status
+                        </Text>
                         <PieChart
                             data={pieData.map((item) => ({
                                 name: item.name,
@@ -134,7 +157,7 @@ const AnalysisTab = () => {
                                 legendFontSize: item.legendFontSize,
                             }))}
                             width={chartWidth}
-                            height={220}
+                            height={chartHeight}
                             chartConfig={{
                                 backgroundGradientFrom: 'white',
                                 backgroundGradientTo: 'white',
@@ -143,7 +166,7 @@ const AnalysisTab = () => {
                             }}
                             accessor="population"
                             backgroundColor="transparent"
-                            paddingLeft="0"
+                            paddingLeft="10"
                         />
                     </View>
                 )}
@@ -160,7 +183,6 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
     },
     title: {
-        fontSize: 22,
         fontWeight: 'bold',
         marginBottom: 12,
     },
@@ -182,7 +204,6 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     chartTitle: {
-        fontSize: 16,
         fontWeight: '600',
         alignSelf: 'center',
         marginBottom: 6,

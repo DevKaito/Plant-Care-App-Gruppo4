@@ -114,7 +114,9 @@ const HomeTab = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.header}>Plant Care App</Text>
+            <Text style={[styles.header, isLandscape && styles.headerLandscape]}>
+                Plant Care App
+            </Text>
 
             {isLandscape ? (
                 <View style={styles.landscapeWrapper}>
@@ -164,6 +166,10 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
         marginVertical: 24,
+    },
+    headerLandscape: {
+        fontSize: 28,
+        marginVertical: 12,
     },
     sectionTitle: {
         fontSize: 20,
@@ -249,8 +255,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 16,
     },
-
-    // Layout landscape
     landscapeWrapper: {
         flex: 1,
         flexDirection: 'row',
